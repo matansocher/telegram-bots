@@ -1,7 +1,7 @@
 const TelegramBot = require('node-telegram-bot-api');
 const { BOTS } = require('../config');
 const { ANALYTIC_EVENT_NAMES, VOICE_PAL_OPTIONS, INITIAL_BOT_RESPONSE } = require('../services/voice-pal/voice-pal.config');
-const bot = new TelegramBot(process.env.VOICE_PAL_STAGING_TELEGRAM_BOT_TOKEN, { polling: true });
+const bot = new TelegramBot(process.env.VOICE_PAL_TELEGRAM_BOT_TOKEN, { polling: true });
 const generalBotService = require('./general-bot.service');
 const utilsService = require('../services/utils.service');
 const { getKeyboardOptions, handleActionSelection, handleAction } = require('../services/voice-pal/voice-pal.service');
