@@ -95,6 +95,11 @@ async function handleTextToSpeechAction(bot, chatId, { text }) {
     await utilsService.deleteFile(audioFilePath);
 }
 
+async function handleSummarizeTextAction(bot, chatId, { text }) {
+    const textSummary = await openaiService.getChatCompletion(SUMMARY_PROMPTS.TEXT, text);
+    await generalBotService.sendMessage(bot, chatId, textSummary, getKeyboardOptions());
+}
+
 async function handleSummarizeYoutubeVideoAction(bot, chatId, { text }) {
     const videoId = utilsService.getQueryParams(text).v;
     if (!videoId) {
@@ -125,6 +130,7 @@ const handlers = {
     handleTranscribeAction,
     handleTranslateAction,
     handleTextToSpeechAction,
+    handleSummarizeTextAction,
     handleSummarizeYoutubeVideoAction,
     handleSummarizeTiktokVideoAction,
 };

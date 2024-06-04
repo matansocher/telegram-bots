@@ -21,6 +21,12 @@ const VOICE_PAL_OPTIONS = {
         handler: 'handleTextToSpeechAction',
         analyticsEventName: 'TEXT_TO_SPEECH',
     },
+    SUMMARY_TEXT: {
+        displayName: 'Summarize Text',
+        selectedActionResponse: 'OK, Send me the text, and I will summarize it for you',
+        handler: 'handleSummarizeTextAction',
+        analyticsEventName: 'SUMMARY_TEXT',
+    },
     SUMMARY_YOUTUBE_VIDEO: {
         displayName: 'Summary of a YouTube Video',
         selectedActionResponse: 'OK, Send me a link to a youtube video and I will summarize it for you',
@@ -46,6 +52,8 @@ const ANALYTIC_EVENT_NAMES = {
 };
 
 const SUMMARY_PROMPTS = {
+    TEXT: 'You are a helpful assistant. You will be provided with a text from the user.' +
+        'Please summarize it. You can also split the summary into section, and add to each section its header.',
     YOUTUBE: 'You are a helpful assistant. You will be provided with a transcription of a youtube video from the user, the includes all the sentences in the video and the timestamp.' +
         'Please summarize the transcript. You can also split the summary into section, and add to each section its header and also the time frame the content of the section.',
     TIKTOK: 'You are a helpful assistant. You will be provided with a transcription of a video from the user, the includes all the sentences in the video and the timestamp.' +
