@@ -21,7 +21,7 @@ async function startHandler(message) {
         mongoService.saveUserDetails(mongoConfig.VOICE_PAL.NAME, { telegramUserId, chatId, firstName, lastName, username });
         const replyText = INITIAL_BOT_RESPONSE.replace('{firstName}', firstName || username || '');
         await generalBotService.sendMessage(bot, chatId, replyText, getKeyboardOptions());
-        mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.START, { chatId })
+        mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.Start, { chatId })
         logger.info(functionName, `${logBody} - success`);
     } catch (err) {
         logger.error(functionName, `${logBody} - error - ${utilsService.getErrorMessage(err)}`);
@@ -40,7 +40,7 @@ async function messageHandler(functionName, message) {
     try {
         logger.info(functionName, `${logBody} - start`);
 
-        const availableActions = Object.keys(VOICE_PAL_OPTIONS).map(key => VOICE_PAL_OPTIONS[key]);
+        const availableActions = Object.keys(VOICE_PAL_OPTIONS).map(option => VOICE_PAL_OPTIONS[option].displayName);
         if (availableActions.includes(text)) {
             await handleActionSelection(bot, chatId, text);
         } else {

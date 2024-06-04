@@ -157,7 +157,7 @@ async function textHandler(message) {
     restaurant = restaurant.toLowerCase();
 
     // prevent built in options to be processed also here
-    if (Object.keys(WOLT_BOT_OPTIONS).map(key => WOLT_BOT_OPTIONS[key]).includes(restaurant)) return;
+    if (Object.keys(WOLT_BOT_OPTIONS).map(option => WOLT_BOT_OPTIONS[option]).includes(restaurant)) return;
 
     const logBody = `message :: chatId: ${chatId}, firstname: ${firstName}, lastname: ${lastName}, restaurant: ${restaurant}`;
     logger.info(textHandler.name, `${logBody} - start`);

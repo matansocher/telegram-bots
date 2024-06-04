@@ -5,7 +5,6 @@ const {
     SUMMARY_PROMPTS,
     NOT_FOUND_VIDEO_MESSAGES,
     VOICE_PAL_OPTIONS,
-    SELECTED_ACTIONS_RESPONSES,
 } = require('./voice-pal.config');
 const openaiService = require('../openai/openai.service');
 const userSelectionService = require('./user-selections.service');
@@ -23,7 +22,7 @@ function getKeyboardOptions() {
     return {
         reply_markup: {
             keyboard: Object.keys(VOICE_PAL_OPTIONS).map(option => {
-                return [{ text: VOICE_PAL_OPTIONS[option] }];
+                return [{ text: VOICE_PAL_OPTIONS[option].displayName }];
             }),
             resize_keyboard: true,
         },
@@ -32,7 +31,8 @@ function getKeyboardOptions() {
 
 async function handleActionSelection(bot, chatId, selection) {
     userSelectionService.setCurrentUserAction(chatId, selection);
-    await generalBotService.sendMessage(bot, chatId, SELECTED_ACTIONS_RESPONSES[selection], getKeyboardOptions());
+    const relevantAction = Object.keys(VOICE_PAL_OPTIONS).find(option => VOICE_PAL_OPTIONS[option].displayName === selection);
+    await generalBotService.sendMessage(bot, chatId, VOICE_PAL_OPTIONS[relevantAction].selectedActionResponse, getKeyboardOptions());
 }
 
 async function handleAction(bot, message) {
@@ -44,32 +44,15 @@ async function handleAction(bot, message) {
         return generalBotService.sendMessage(bot, chatId, `Please select an action first.`);
     }
 
-    switch (userAction) {
-        case VOICE_PAL_OPTIONS.TRANSCRIBE:
-            await handleTranscribeAction(bot, chatId, video, audio);
-            mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.TRANSCRIBE, { chatId })
-            break;
-        case VOICE_PAL_OPTIONS.TRANSLATE:
-            await handleTranslateAction(bot, chatId, text, video, audio);
-            mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.TRANSLATE, { chatId })
-            break;
-        case VOICE_PAL_OPTIONS.TEXT_TO_SPEECH:
-            await handleTextToSpeechAction(bot, chatId, text);
-            mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.TEXT_TO_SPEECH, { chatId })
-            break;
-        case VOICE_PAL_OPTIONS.SUMMARY_YOUTUBE_VIDEO:
-            await handleSummarizeYoutubeVideoAction(bot, chatId, text);
-            mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.SUMMARY_YOUTUBE_VIDEO, { chatId })
-            break;
-        case VOICE_PAL_OPTIONS.SUMMARY_TIKTOK_VIDEO:
-            await handleSummarizeTiktokVideoAction(bot, chatId, text);
-            mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.SUMMARY_TIKTOK_VIDEO, { chatId })
-            break;
-    }
+    const relevantActionKey = Object.keys(VOICE_PAL_OPTIONS).find(option => VOICE_PAL_OPTIONS[option].displayName === userAction);
+    const relevantAction = VOICE_PAL_OPTIONS[relevantActionKey];
+    await handlers[relevantAction.handler](bot, chatId, { text, audio, video });
+
+    mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES[userAction], { chatId });
     // userSelectionService.removeCurrentUserAction(chatId);
 }
 
-async function handleTranscribeAction(bot, chatId, video, audio) {
+async function handleTranscribeAction(bot, chatId, { video, audio }) {
     let audioFileLocalPath;
     if (video && video.file_id) {
         const videoFileLocalPath = await bot.downloadFile(video.file_id, LOCAL_FILES_PATH);
@@ -84,7 +67,7 @@ async function handleTranscribeAction(bot, chatId, video, audio) {
     await utilsService.deleteFile(audioFileLocalPath);
 }
 
-async function handleTranslateAction(bot, chatId, text, video, audio) {
+async function handleTranslateAction(bot, chatId, { text, video, audio }) {
     let resText = '';
     let audioFileLocalPath = '';
 
@@ -106,14 +89,14 @@ async function handleTranslateAction(bot, chatId, text, video, audio) {
     await generalBotService.sendMessage(bot, chatId, resText, getKeyboardOptions());
 }
 
-async function handleTextToSpeechAction(bot, chatId, text) {
+async function handleTextToSpeechAction(bot, chatId, { text }) {
     const audioFilePath = await textToSpeechService.processText(text);
     await generalBotService.sendVoice(bot, chatId, audioFilePath, getKeyboardOptions());
     await utilsService.deleteFile(audioFilePath);
 }
 
-async function handleSummarizeYoutubeVideoAction(bot, chatId, url) {
-    const videoId = utilsService.getQueryParams(url).v;
+async function handleSummarizeYoutubeVideoAction(bot, chatId, { text }) {
+    const videoId = utilsService.getQueryParams(text).v;
     if (!videoId) {
         await generalBotService.sendMessage(bot, chatId, NOT_FOUND_VIDEO_MESSAGES.YOUTUBE, getKeyboardOptions());
     }
@@ -122,18 +105,28 @@ async function handleSummarizeYoutubeVideoAction(bot, chatId, url) {
     await generalBotService.sendMessage(bot, chatId, summaryTranscription, getKeyboardOptions());
 }
 
-async function handleSummarizeTiktokVideoAction(bot, chatId, videoUrl) {
-    const audio = await tiktokDownloaderService.getTiktokAudio(videoUrl);
+async function handleSummarizeTiktokVideoAction(bot, chatId, { text }) {
+    const audio = await tiktokDownloaderService.getTiktokAudio(text);
     if (!audio) {
         await generalBotService.sendMessage(bot, chatId, NOT_FOUND_VIDEO_MESSAGES.TIKTOK, getKeyboardOptions());
     }
+
     const audioFilePath = `${LOCAL_FILES_PATH}/${new Date().getTime()}.mp3`;
     fs.writeFileSync(audioFilePath, audio)
     const transcription = await transcriptorService.processAudioFile(audioFilePath);
+
     const summaryTranscription = await openaiService.getChatCompletion(SUMMARY_PROMPTS.TIKTOK, transcription);
     await generalBotService.sendMessage(bot, chatId, summaryTranscription, getKeyboardOptions());
     await utilsService.deleteFile(audioFilePath);
 }
+
+const handlers = {
+    handleTranscribeAction,
+    handleTranslateAction,
+    handleTextToSpeechAction,
+    handleSummarizeYoutubeVideoAction,
+    handleSummarizeTiktokVideoAction,
+};
 
 module.exports = {
     getKeyboardOptions,
