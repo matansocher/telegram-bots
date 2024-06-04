@@ -1,4 +1,5 @@
 const fs = require('fs');
+const { chunk: _chunk } = require('lodash');
 const { OpenAI } = require('openai');
 const {
     OPENAI_API_KEY,
@@ -38,16 +39,22 @@ async function getAudioFromText(text) {
 }
 
 async function getChatCompletion(prompt, userText) {
+    let userMessages;
+    if (typeof userText === 'string') {
+        userMessages = [userText];
+    } else { // array
+        userMessages = _chunk(userText, 100);
+    }
     const result = await openai.chat.completions.create({
         messages: [
             {
                 role: 'system',
                 content: prompt,
             },
-            {
+            ...userMessages.map((message) => ({
                 role: 'user',
-                content: userText,
-            },
+                content: typeof message === 'string' ? message : JSON.stringify(message),
+            })),
         ],
         model: CHAT_COMPLETIONS_MODEL,
     });

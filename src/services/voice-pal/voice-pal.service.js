@@ -106,7 +106,8 @@ async function handleSummarizeYoutubeVideoAction(bot, chatId, { text }) {
 }
 
 async function handleSummarizeTiktokVideoAction(bot, chatId, { text }) {
-    const audio = await tiktokDownloaderService.getTiktokAudio(text);
+    const tiktokVideoUrl = text.split('?')[0];
+    const audio = await tiktokDownloaderService.getTiktokAudio(tiktokVideoUrl);
     if (!audio) {
         await generalBotService.sendMessage(bot, chatId, NOT_FOUND_VIDEO_MESSAGES.TIKTOK, getKeyboardOptions());
     }
