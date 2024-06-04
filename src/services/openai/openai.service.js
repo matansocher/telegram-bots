@@ -1,6 +1,12 @@
 const fs = require('fs');
 const { OpenAI } = require('openai');
-const { OPENAI_API_KEY, SOUND_MODEL, TEXT_TO_SPEECH_MODEL, TEXT_TO_SPEECH_VOICE } = require('./openai.config');
+const {
+    OPENAI_API_KEY,
+    CHAT_COMPLETIONS_MODEL,
+    SOUND_MODEL,
+    TEXT_TO_SPEECH_MODEL,
+    TEXT_TO_SPEECH_VOICE,
+} = require('./openai.config');
 
 const openai = new OpenAI({
     apiKey: OPENAI_API_KEY,
@@ -31,8 +37,26 @@ async function getAudioFromText(text) {
     });
 }
 
+async function getChatCompletion(prompt, userText) {
+    const result = await openai.chat.completions.create({
+        messages: [
+            {
+                role: 'system',
+                content: prompt,
+            },
+            {
+                role: 'user',
+                content: userText,
+            },
+        ],
+        model: CHAT_COMPLETIONS_MODEL,
+    });
+    return result.choices[0].message.content;
+}
+
 module.exports = {
     getTranscriptFromAudio,
     getTranslationFromAudio,
     getAudioFromText,
+    getChatCompletion,
 };

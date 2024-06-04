@@ -4,7 +4,7 @@ const openaiService = require('../openai/openai.service');
 const utilsService = require('../utils.service');
 const logger = new (require('../logger.service.js'))(module.filename);
 
-async function processText(chatId, text) {
+async function processText(text) {
     try {
         logger.info(processText.name, `start`);
 

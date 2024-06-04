@@ -40,8 +40,20 @@ function getErrorMessage(error) {
     return error instanceof Error ? error.message : JSON.stringify(error);
 }
 
+function getQueryParams(urlString) {
+    const parsedUrl = new URL(urlString);
+    const queryParams = {};
+
+    for (const [key, value] of parsedUrl.searchParams.entries()) {
+        queryParams[key] = value;
+    }
+
+    return queryParams;
+}
+
 module.exports = {
     getErrorMessage,
     deleteFile,
     extractAudioFromVideo,
+    getQueryParams,
 };

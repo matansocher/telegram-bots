@@ -2,7 +2,7 @@ const openaiService = require('../openai/openai.service');
 const utilsService = require('../utils.service');
 const logger = new (require('../logger.service.js'))(module.filename);
 
-async function processAudioFile(chatId, audioFileLocalPath) {
+async function processAudioFile(audioFileLocalPath) {
     try {
         logger.info(processAudioFile.name, `start`);
         const result = await openaiService.getTranscriptFromAudio(audioFileLocalPath);

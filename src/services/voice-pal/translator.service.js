@@ -3,7 +3,7 @@ const googleTranslateService = require('../google-translate/google-translate.ser
 const utilsService = require('../utils.service');
 const logger = new (require('../logger.service.js'))(module.filename);
 
-async function processAudioFile(chatId, audioFileLocalPath) {
+async function processAudioFile(audioFileLocalPath) {
     try {
         logger.info(processAudioFile.name, `start`);
         const result = await openaiService.getTranslationFromAudio(audioFileLocalPath);
@@ -15,7 +15,7 @@ async function processAudioFile(chatId, audioFileLocalPath) {
     }
 }
 
-async function processText(chatId, text) {
+async function processText(text) {
     try {
         logger.info(processText.name, `start`);
         const result = await googleTranslateService.getTranslationToEnglish(text);
