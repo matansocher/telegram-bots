@@ -7,7 +7,7 @@ async function getYoutubeVideoTranscription(videoId) {
         logger.info(getYoutubeVideoTranscription.name, `start`);
         const result = await YoutubeTranscript.fetchTranscript(videoId);
         const parsedResult = parseTranscriptResult(result);
-        logger.info(getYoutubeVideoTranscription.name, `start`);
+        logger.info(getYoutubeVideoTranscription.name, `end`);
         return parsedResult;
     } catch (err) {
         logger.error(getYoutubeVideoTranscription.name, `err - ${utilsService.getErrorMessage(err)}`);

@@ -28,6 +28,7 @@
     "mongodb": "^4.1.1",
     "node-telegram-bot-api": "^0.66.0",
     "openai": "^4.45.0",
+    "tiktokapi-src": "^1.2.0",
     "youtube-transcript": "^1.2.1"
   }
 }

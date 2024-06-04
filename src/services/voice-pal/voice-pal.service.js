@@ -1,10 +1,21 @@
-const { ANALYTIC_EVENT_NAMES, LOCAL_FILES_PATH, YOUTUBE_SUMMARY_PROMPT, NOT_FOUND_YOUTUBE_VIDEO_MESSAGE, VOICE_PAL_OPTIONS, SELECTED_ACTIONS_RESPONSES } = require('./voice-pal.config');
+const fs = require('fs');
+const {
+    ANALYTIC_EVENT_NAMES,
+    LOCAL_FILES_PATH,
+    YOUTUBE_SUMMARY_PROMPT,
+    TIKTOK_SUMMARY_PROMPT,
+    NOT_FOUND_YOUTUBE_VIDEO_MESSAGE,
+    NOT_FOUND_TIKTOK_VIDEO_MESSAGE,
+    VOICE_PAL_OPTIONS,
+    SELECTED_ACTIONS_RESPONSES,
+} = require('./voice-pal.config');
 const openaiService = require('../openai/openai.service');
 const userSelectionService = require('./user-selections.service');
 const transcriptorService = require('./transcriptor.service');
 const translatorService = require('./translator.service');
 const textToSpeechService = require('./text-to-speech.service');
 const youtubeTranscriptorService = require('./youtube-transcriptor.service');
+const tiktokDownloaderService = require('./tiktok-downloader.service');
 const mongoConfig = require('../mongo/mongo.config');
 const mongoService = require('../mongo/mongo.service');
 const generalBotService = require('../../telegram-bots/general-bot.service');
@@ -51,6 +62,10 @@ async function handleAction(bot, message) {
         case VOICE_PAL_OPTIONS.SUMMARY_YOUTUBE_VIDEO:
             await handleSummarizeYoutubeVideoAction(bot, chatId, text);
             mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.SUMMARY_YOUTUBE_VIDEO, { chatId })
+            break;
+        case VOICE_PAL_OPTIONS.SUMMARY_TIKTOK_VIDEO:
+            await handleSummarizeTiktokVideoAction(bot, chatId, text);
+            mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.SUMMARY_TIKTOK_VIDEO, { chatId })
             break;
     }
     // userSelectionService.removeCurrentUserAction(chatId);
@@ -107,6 +122,19 @@ async function handleSummarizeYoutubeVideoAction(bot, chatId, url) {
     const transcription = await youtubeTranscriptorService.getYoutubeVideoTranscription(videoId);
     const summaryTranscription = await openaiService.getChatCompletion(YOUTUBE_SUMMARY_PROMPT, transcription);
     await generalBotService.sendMessage(bot, chatId, summaryTranscription, getKeyboardOptions());
+}
+
+async function handleSummarizeTiktokVideoAction(bot, chatId, videoUrl) {
+    const audio = await tiktokDownloaderService.getTiktokAudio(videoUrl);
+    if (!audio) {
+        await generalBotService.sendMessage(bot, chatId, NOT_FOUND_TIKTOK_VIDEO_MESSAGE, getKeyboardOptions());
+    }
+    const audioFilePath = `${LOCAL_FILES_PATH}/${new Date().getTime()}.mp3`;
+    fs.writeFileSync(audioFilePath, audio)
+    const transcription = await transcriptorService.processAudioFile(audioFilePath);
+    const summaryTranscription = await openaiService.getChatCompletion(TIKTOK_SUMMARY_PROMPT, transcription);
+    await generalBotService.sendMessage(bot, chatId, summaryTranscription, getKeyboardOptions());
+    await utilsService.deleteFile(audioFilePath);
 }
 
 module.exports = {
