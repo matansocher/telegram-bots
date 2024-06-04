@@ -2,10 +2,8 @@ const fs = require('fs');
 const {
     ANALYTIC_EVENT_NAMES,
     LOCAL_FILES_PATH,
-    YOUTUBE_SUMMARY_PROMPT,
-    TIKTOK_SUMMARY_PROMPT,
-    NOT_FOUND_YOUTUBE_VIDEO_MESSAGE,
-    NOT_FOUND_TIKTOK_VIDEO_MESSAGE,
+    SUMMARY_PROMPTS,
+    NOT_FOUND_VIDEO_MESSAGES,
     VOICE_PAL_OPTIONS,
     SELECTED_ACTIONS_RESPONSES,
 } = require('./voice-pal.config');
@@ -117,22 +115,22 @@ async function handleTextToSpeechAction(bot, chatId, text) {
 async function handleSummarizeYoutubeVideoAction(bot, chatId, url) {
     const videoId = utilsService.getQueryParams(url).v;
     if (!videoId) {
-        await generalBotService.sendMessage(bot, chatId, NOT_FOUND_YOUTUBE_VIDEO_MESSAGE, getKeyboardOptions());
+        await generalBotService.sendMessage(bot, chatId, NOT_FOUND_VIDEO_MESSAGES.YOUTUBE, getKeyboardOptions());
     }
     const transcription = await youtubeTranscriptorService.getYoutubeVideoTranscription(videoId);
-    const summaryTranscription = await openaiService.getChatCompletion(YOUTUBE_SUMMARY_PROMPT, transcription);
+    const summaryTranscription = await openaiService.getChatCompletion(SUMMARY_PROMPTS.YOUTUBE, transcription);
     await generalBotService.sendMessage(bot, chatId, summaryTranscription, getKeyboardOptions());
 }
 
 async function handleSummarizeTiktokVideoAction(bot, chatId, videoUrl) {
     const audio = await tiktokDownloaderService.getTiktokAudio(videoUrl);
     if (!audio) {
-        await generalBotService.sendMessage(bot, chatId, NOT_FOUND_TIKTOK_VIDEO_MESSAGE, getKeyboardOptions());
+        await generalBotService.sendMessage(bot, chatId, NOT_FOUND_VIDEO_MESSAGES.TIKTOK, getKeyboardOptions());
     }
     const audioFilePath = `${LOCAL_FILES_PATH}/${new Date().getTime()}.mp3`;
     fs.writeFileSync(audioFilePath, audio)
     const transcription = await transcriptorService.processAudioFile(audioFilePath);
-    const summaryTranscription = await openaiService.getChatCompletion(TIKTOK_SUMMARY_PROMPT, transcription);
+    const summaryTranscription = await openaiService.getChatCompletion(SUMMARY_PROMPTS.TIKTOK, transcription);
     await generalBotService.sendMessage(bot, chatId, summaryTranscription, getKeyboardOptions());
     await utilsService.deleteFile(audioFilePath);
 }

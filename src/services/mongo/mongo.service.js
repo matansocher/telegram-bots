@@ -118,11 +118,11 @@ function getUserCollection(dbName) {
     }
 }
 
-function sendAnalyticLog(dbName, eventName, { chatId, restaurant = null }) {
+function sendAnalyticLog(dbName, eventName, { chatId, data = null }) {
     const collection = getAnalyticsCollection(dbName);
     const log = {
         chatId,
-        restaurant,
+        data,
         eventName,
         // message,
         // error,
