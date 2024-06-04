@@ -1,4 +1,4 @@
-const { ANALYTIC_EVENT_NAMES, LOCAL_FILES_PATH, YOUTUBE_SUMMARY_PROMPT, VOICE_PAL_OPTIONS, SELECTED_ACTIONS_RESPONSES } = require('./voice-pal.config');
+const { ANALYTIC_EVENT_NAMES, LOCAL_FILES_PATH, YOUTUBE_SUMMARY_PROMPT, NOT_FOUND_YOUTUBE_VIDEO_MESSAGE, VOICE_PAL_OPTIONS, SELECTED_ACTIONS_RESPONSES } = require('./voice-pal.config');
 const openaiService = require('../openai/openai.service');
 const userSelectionService = require('./user-selections.service');
 const transcriptorService = require('./transcriptor.service');
@@ -102,7 +102,7 @@ async function handleTextToSpeechAction(bot, chatId, text) {
 async function handleSummarizeYoutubeVideoAction(bot, chatId, url) {
     const videoId = utilsService.getQueryParams(url).v;
     if (!videoId) {
-        await generalBotService.sendMessage(bot, chatId, 'I could not find the video you shared', getKeyboardOptions());
+        await generalBotService.sendMessage(bot, chatId, NOT_FOUND_YOUTUBE_VIDEO_MESSAGE, getKeyboardOptions());
     }
     const transcription = await youtubeTranscriptorService.getYoutubeVideoTranscription(videoId);
     const summaryTranscription = await openaiService.getChatCompletion(YOUTUBE_SUMMARY_PROMPT, transcription);

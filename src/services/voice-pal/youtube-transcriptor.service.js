@@ -16,7 +16,19 @@ async function getYoutubeVideoTranscription(videoId) {
 }
 
 function parseTranscriptResult(result) {
-    return result.map((item) => item.text).join('\n');
+    const parsedResult = result.map((item) => {
+        const { text, duration, offset } = item;
+        const start = getTimestampInMinutesFromSeconds(offset);
+        const end = getTimestampInMinutesFromSeconds(offset + duration);
+        return { text, start, end };
+    });
+    return JSON.stringify(parsedResult);
+}
+
+function getTimestampInMinutesFromSeconds(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds}`;
 }
 
 module.exports = {
