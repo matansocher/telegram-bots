@@ -47,7 +47,7 @@ async function handleAction(bot, message) {
             mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.TEXT_TO_SPEECH, { chatId })
             break;
     }
-    userSelectionService.removeCurrentUserAction(chatId);
+    // userSelectionService.removeCurrentUserAction(chatId);
 }
 
 async function handleTranscribeAction(bot, chatId, video, audio) {
