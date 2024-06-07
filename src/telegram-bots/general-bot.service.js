@@ -83,9 +83,9 @@ async function sendVenue(bot, chatId, latitude, longitude, title, address) {
     }
 }
 
-async function sendPhoto(bot, chatId, imageUrl) {
+async function sendPhoto(bot, chatId, imageUrl, form = {}) {
     try {
-        await bot.sendPhoto(chatId, imageUrl);
+        await bot.sendPhoto(chatId, imageUrl, form);
     } catch (err) {
         logger.error(sendPhoto.name, `err: ${utilsService.getErrorMessage(err)}`);
     }

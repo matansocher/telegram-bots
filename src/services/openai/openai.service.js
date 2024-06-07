@@ -5,6 +5,7 @@ const {
     OPENAI_API_KEY,
     CHAT_COMPLETIONS_MODEL,
     SOUND_MODEL,
+    IMAGE_GENERATION_MODEL,
     TEXT_TO_SPEECH_MODEL,
     TEXT_TO_SPEECH_VOICE,
 } = require('./openai.config');
@@ -61,9 +62,20 @@ async function getChatCompletion(prompt, userText) {
     return result.choices[0].message.content;
 }
 
+async function createImage(prompt) {
+    const response = await openai.images.generate({
+        model: IMAGE_GENERATION_MODEL,
+        prompt,
+        n: 1,
+        size: "1024x1024",
+    });
+    return response.data[0].url;
+}
+
 module.exports = {
     getTranscriptFromAudio,
     getTranslationFromAudio,
     getAudioFromText,
     getChatCompletion,
+    createImage,
 };

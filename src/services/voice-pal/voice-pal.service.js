@@ -122,6 +122,11 @@ async function handleSummarizeTiktokVideoAction(bot, chatId, { text }) {
     await utilsService.deleteFile(audioFilePath);
 }
 
+async function handleImageGenerationAction(bot, chatId, { text }) {
+    const imageUrl = await openaiService.createImage(text);
+    await generalBotService.sendPhoto(bot, chatId, imageUrl, getKeyboardOptions());
+}
+
 const handlers = {
     handleTranscribeAction,
     handleTranslateAction,
@@ -129,6 +134,7 @@ const handlers = {
     handleSummarizeTextAction,
     handleSummarizeYoutubeVideoAction,
     handleSummarizeTiktokVideoAction,
+    handleImageGenerationAction,
 };
 
 module.exports = {

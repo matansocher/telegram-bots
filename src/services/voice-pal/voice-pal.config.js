@@ -45,6 +45,13 @@ const VOICE_PAL_OPTIONS = {
         analyticsEventName: 'SUMMARY_TIKTOK_VIDEO',
         showLoader: true,
     },
+    IMAGE_GENERATION: {
+        displayName: 'Image Generation',
+        selectedActionResponse: 'OK, Send me the description of the image and I will create it for you',
+        handler: 'handleImageGenerationAction',
+        analyticsEventName: 'IMAGE_GENERATION',
+        showLoader: true,
+    },
 };
 
 const ANALYTIC_EVENT_NAMES = {
