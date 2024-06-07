@@ -8,36 +8,42 @@ const VOICE_PAL_OPTIONS = {
         selectedActionResponse: 'OK, send me an audio or video file you want me to transcribe',
         handler: 'handleTranscribeAction',
         analyticsEventName: 'TRANSCRIBE',
+        showLoader: true,
     },
     TRANSLATE: {
         displayName: 'Translate',
         selectedActionResponse: 'OK, send me a text, audio or a video file you want me to translate',
         handler: 'handleTranslateAction',
         analyticsEventName: 'TRANSLATE',
+        showLoader: false,
     },
     TEXT_TO_SPEECH: {
         displayName: 'Text to Speech',
         selectedActionResponse: 'OK, Send me the text you want me to convert to speech',
         handler: 'handleTextToSpeechAction',
         analyticsEventName: 'TEXT_TO_SPEECH',
+        showLoader: true,
     },
     SUMMARY_TEXT: {
         displayName: 'Summarize Text',
         selectedActionResponse: 'OK, Send me the text, and I will summarize it for you',
         handler: 'handleSummarizeTextAction',
         analyticsEventName: 'SUMMARY_TEXT',
+        showLoader: true,
     },
     SUMMARY_YOUTUBE_VIDEO: {
         displayName: 'Summary of a YouTube Video',
         selectedActionResponse: 'OK, Send me a link to a youtube video and I will summarize it for you',
         handler: 'handleSummarizeYoutubeVideoAction',
         analyticsEventName: 'SUMMARY_YOUTUBE_VIDEO',
+        showLoader: true,
     },
     SUMMARY_TIKTOK_VIDEO: {
         displayName: 'Summary of a Tiktok Video',
         selectedActionResponse: 'OK, Send me a link to a tiktok video and I will summarize it for you',
         handler: 'handleSummarizeTiktokVideoAction',
         analyticsEventName: 'SUMMARY_TIKTOK_VIDEO',
+        showLoader: true,
     },
 };
 

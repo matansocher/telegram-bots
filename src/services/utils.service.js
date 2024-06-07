@@ -7,7 +7,7 @@ const { exec } = require('child_process');
 
 exec('which ffmpeg', (error, stdout) => {
     if (error) {
-        logger.error('which ffmpeg exec', `Error finding ffmpeg: ${utilsService.getErrorMessage(error)}`);
+        logger.error('which ffmpeg exec', `Error finding ffmpeg: ${getErrorMessage(error)}`);
         return;
     }
     logger.info('which ffmpeg exec', `FFmpeg path: ${stdout.trim()}`);

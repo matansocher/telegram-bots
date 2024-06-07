@@ -35,9 +35,27 @@ function getInlineKeyboardMarkup(inlineKeyboardButtons) {
 
 async function sendMessage(bot, chatId, messageText, form = {}) {
     try {
-        await bot.sendMessage(chatId, messageText, form);
+        return await bot.sendMessage(chatId, messageText, form);
     } catch (err) {
         logger.error(sendMessage.name, `err: ${utilsService.getErrorMessage(err)}`);
+        throw err;
+    }
+}
+
+async function editMessage(bot, chatId, messageId, messageText) {
+    try {
+        return await bot.editMessageText(messageText, { chat_id: chatId, message_id: messageId });
+    } catch (err) {
+        logger.error(editMessage.name, `err: ${utilsService.getErrorMessage(err)}`);
+        throw err;
+    }
+}
+
+async function deleteMessage(bot, chatId, messageId) {
+    try {
+        await bot.deleteMessage(chatId, messageId);
+    } catch (err) {
+        logger.error(editMessage.name, `err: ${utilsService.getErrorMessage(err)}`);
     }
 }
 
@@ -73,9 +91,9 @@ async function sendPhoto(bot, chatId, imageUrl) {
     }
 }
 
-async function setBotTyping(bot, chatId, form = {}) {
+function setBotTyping(bot, chatId, form = {}) {
     try {
-        await bot.sendChatAction(chatId, 'typing', form);
+        bot.sendChatAction(chatId, 'typing', form);
     } catch (err) {
         logger.error(setBotTyping.name, `err: ${utilsService.getErrorMessage(err)}`);
     }
@@ -93,6 +111,8 @@ module.exports = {
     getCallbackQueryData,
     getInlineKeyboardMarkup,
     sendMessage,
+    editMessage,
+    deleteMessage,
     sendAudio,
     sendVoice,
     sendVenue,

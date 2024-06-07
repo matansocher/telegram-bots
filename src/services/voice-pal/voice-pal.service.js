@@ -35,18 +35,14 @@ async function handleActionSelection(bot, chatId, selection) {
     await generalBotService.sendMessage(bot, chatId, VOICE_PAL_OPTIONS[relevantAction].selectedActionResponse, getKeyboardOptions());
 }
 
-async function handleAction(bot, message) {
+async function handleAction(bot, message, userAction) {
     const { chatId, text, audio, video  } = generalBotService.getMessageData(message);
-    await generalBotService.setBotTyping(bot, chatId);
 
-    const userAction = userSelectionService.getCurrentUserAction(chatId);
     if (!userAction) {
         return generalBotService.sendMessage(bot, chatId, `Please select an action first.`);
     }
 
-    const relevantActionKey = Object.keys(VOICE_PAL_OPTIONS).find(option => VOICE_PAL_OPTIONS[option].displayName === userAction);
-    const relevantAction = VOICE_PAL_OPTIONS[relevantActionKey];
-    await handlers[relevantAction.handler](bot, chatId, { text, audio, video });
+    await handlers[userAction.handler](bot, chatId, { text, audio, video });
 
     mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES[userAction], { chatId });
     // userSelectionService.removeCurrentUserAction(chatId);
@@ -117,7 +113,7 @@ async function handleSummarizeTiktokVideoAction(bot, chatId, { text }) {
         await generalBotService.sendMessage(bot, chatId, NOT_FOUND_VIDEO_MESSAGES.TIKTOK, getKeyboardOptions());
     }
 
-    const audioFilePath = `${LOCAL_FILES_PATH}/${new Date().getTime()}.mp3`;
+    const audioFilePath = `${LOCAL_FILES_PATH}/tiktok-summary-${new Date().getTime()}.mp3`;
     fs.writeFileSync(audioFilePath, audio)
     const transcription = await transcriptorService.processAudioFile(audioFilePath);
 
