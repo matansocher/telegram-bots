@@ -1,3 +1,5 @@
+const isProd = process.env.IS_PROD === 'true';
+
 const BOTS = {
     WOLT: {
         name: 'Wolt Bot',
@@ -8,5 +10,6 @@ const BOTS = {
 };
 
 module.exports = {
-    BOTS
+    isProd,
+    BOTS,
 };

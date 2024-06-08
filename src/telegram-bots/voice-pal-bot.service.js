@@ -48,7 +48,7 @@ async function messageHandler(functionName, message) {
             await voicePalService.handleActionSelection(bot, chatId, text);
         } else {
             const userAction = userSelectionService.getCurrentUserAction(chatId);
-            if (userAction.showLoader) { // showLoader
+            if (userAction && userAction.showLoader) { // showLoader
                 await messageLoaderService.withMessageLoader(bot, chatId, { cycleDuration: 5000 }, async () => {
                     await voicePalService.handleAction(bot, message, userAction);
                 });

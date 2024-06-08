@@ -1,4 +1,5 @@
 const { MongoClient } = require('mongodb');
+const config = require('../../config');
 const mongoConfig = require('./mongo.config');
 const woltConfig = require('../wolt/wolt.config');
 const utilsService = require('../utils.service');
@@ -119,6 +120,9 @@ function getUserCollection(dbName) {
 }
 
 function sendAnalyticLog(dbName, eventName, { chatId, data = null }) {
+    if (!config.isProd) {
+        return;
+    }
     const collection = getAnalyticsCollection(dbName);
     const log = {
         chatId,
