@@ -1,8 +1,8 @@
 const axios = require('axios');
 const fs = require('fs').promises;
 const path = require('path');
-const utilsService = require('../utils.service');
-const logger = new (require('../logger.service.js'))(module.filename);
+const utilsService = require('./utils.service');
+const logger = new (require('./logger.service.js'))(module.filename);
 
 async function uploadImage(imageLocalPath) {
     try {

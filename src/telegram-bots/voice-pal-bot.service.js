@@ -3,12 +3,13 @@ const { BOTS } = require('../config');
 const { ANALYTIC_EVENT_NAMES, VOICE_PAL_OPTIONS, INITIAL_BOT_RESPONSE } = require('../services/voice-pal/voice-pal.config');
 const bot = new TelegramBot(process.env.VOICE_PAL_TELEGRAM_BOT_TOKEN, { polling: true });
 const generalBotService = require('./general-bot.service');
-const { withMessageLoader } = require('./message-loader.service');
+const messageLoaderService = require('./message-loader.service');
 const utilsService = require('../services/utils.service');
-const { getKeyboardOptions, handleActionSelection, handleAction } = require('../services/voice-pal/voice-pal.service');
+const voicePalService = require('../services/voice-pal/voice-pal.service');
+const voicePalUtils = require('../services/voice-pal/voice-pal.utils');
 const mongoService = require('../services/mongo/mongo.service');
 const mongoConfig = require('../services/mongo/mongo.config');
-const userSelectionService = require('../services/voice-pal/user-selections.service');
+const userSelectionService = require('../services/user-selections.service');
 const logger = new (require('../services/logger.service.js'))(module.filename);
 
 bot.onText(/\/start/, startHandler);
@@ -22,7 +23,7 @@ async function startHandler(message) {
     try {
         mongoService.saveUserDetails(mongoConfig.VOICE_PAL.NAME, { telegramUserId, chatId, firstName, lastName, username });
         const replyText = INITIAL_BOT_RESPONSE.replace('{firstName}', firstName || username || '');
-        await generalBotService.sendMessage(bot, chatId, replyText, getKeyboardOptions());
+        await generalBotService.sendMessage(bot, chatId, replyText, voicePalUtils.getKeyboardOptions());
         mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.Start, { chatId })
         logger.info(functionName, `${logBody} - success`);
     } catch (err) {
@@ -44,15 +45,15 @@ async function messageHandler(functionName, message) {
 
         const availableActions = Object.keys(VOICE_PAL_OPTIONS).map(option => VOICE_PAL_OPTIONS[option].displayName);
         if (availableActions.includes(text)) {
-            await handleActionSelection(bot, chatId, text);
+            await voicePalService.handleActionSelection(bot, chatId, text);
         } else {
             const userAction = userSelectionService.getCurrentUserAction(chatId);
             if (userAction.showLoader) { // showLoader
-                await withMessageLoader(bot, chatId, { cycleDuration: 5000 }, async () => {
-                    await handleAction(bot, message, userAction);
+                await messageLoaderService.withMessageLoader(bot, chatId, { cycleDuration: 5000 }, async () => {
+                    await voicePalService.handleAction(bot, message, userAction);
                 });
             } else {
-                await handleAction(bot, message, userAction);
+                await voicePalService.handleAction(bot, message, userAction);
             }
         }
 

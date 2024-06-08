@@ -1,6 +1,6 @@
 const { YoutubeTranscript } = require('youtube-transcript');
-const utilsService = require('../utils.service');
-const logger = new (require('../logger.service.js'))(module.filename);
+const utilsService = require('./utils.service');
+const logger = new (require('./logger.service.js'))(module.filename);
 
 async function getYoutubeVideoTranscription(videoId) {
     try {

@@ -1,7 +1,7 @@
 const axios = require('axios');
 const Tiktok = require('tiktokapi-src');
-const utilsService = require('../utils.service');
-const logger = new (require('../logger.service.js'))(module.filename);
+const utilsService = require('./utils.service');
+const logger = new (require('./logger.service.js'))(module.filename);
 
 async function getTiktokAudio(videoUrl) {
     try {
