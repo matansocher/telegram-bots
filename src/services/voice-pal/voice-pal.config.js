@@ -52,6 +52,13 @@ const VOICE_PAL_OPTIONS = {
         analyticsEventName: 'IMAGE_GENERATION',
         showLoader: true,
     },
+    IMAGE_ANALYZER: {
+        displayName: 'Image Analyzer',
+        selectedActionResponse: 'OK, Send me an image and I will analyze it for you',
+        handler: 'handleImageAnalyzerAction',
+        analyticsEventName: 'IMAGE_ANALYZER',
+        showLoader: true,
+    },
 };
 
 const ANALYTIC_EVENT_NAMES = {

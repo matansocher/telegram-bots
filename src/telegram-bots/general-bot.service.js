@@ -10,8 +10,9 @@ function getMessageData(message) {
         lastName: _get(message, 'from.last_name', ''),
         username: _get(message, 'from.username', ''),
         text: _get(message, 'text', '') || _get(message, 'caption', ''),
-        audio: _get(message, 'audio', '') || _get(message, 'voice', ''),
-        video: _get(message, 'video', ''),
+        audio: _get(message, 'audio', null) || _get(message, 'voice', {}),
+        video: _get(message, 'video', null),
+        photo: _get(message, 'photo', null),
         date: _get(message, 'date', ''),
     };
 }

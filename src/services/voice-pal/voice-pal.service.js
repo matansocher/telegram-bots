@@ -6,13 +6,14 @@ const {
     NOT_FOUND_VIDEO_MESSAGES,
     VOICE_PAL_OPTIONS,
 } = require('./voice-pal.config');
+const imgurService = require('./imgur.service');
 const openaiService = require('../openai/openai.service');
-const userSelectionService = require('./user-selections.service');
+const textToSpeechService = require('./text-to-speech.service');
+const tiktokDownloaderService = require('./tiktok-downloader.service');
 const transcriptorService = require('./transcriptor.service');
 const translatorService = require('./translator.service');
-const textToSpeechService = require('./text-to-speech.service');
+const userSelectionService = require('./user-selections.service');
 const youtubeTranscriptorService = require('./youtube-transcriptor.service');
-const tiktokDownloaderService = require('./tiktok-downloader.service');
 const mongoConfig = require('../mongo/mongo.config');
 const mongoService = require('../mongo/mongo.service');
 const generalBotService = require('../../telegram-bots/general-bot.service');
@@ -36,13 +37,13 @@ async function handleActionSelection(bot, chatId, selection) {
 }
 
 async function handleAction(bot, message, userAction) {
-    const { chatId, text, audio, video  } = generalBotService.getMessageData(message);
+    const { chatId, text, audio, video, photo  } = generalBotService.getMessageData(message);
 
     if (!userAction) {
         return generalBotService.sendMessage(bot, chatId, `Please select an action first.`);
     }
 
-    await handlers[userAction.handler](bot, chatId, { text, audio, video });
+    await handlers[userAction.handler](bot, chatId, { text, audio, video, photo });
 
     mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES[userAction], { chatId });
     // userSelectionService.removeCurrentUserAction(chatId);
@@ -127,6 +128,14 @@ async function handleImageGenerationAction(bot, chatId, { text }) {
     await generalBotService.sendPhoto(bot, chatId, imageUrl, getKeyboardOptions());
 }
 
+async function handleImageAnalyzerAction(bot, chatId, { photo }) {
+    const imageLocalPath = await bot.downloadFile(photo[photo.length - 1].file_id, LOCAL_FILES_PATH);
+    const imageUrl = await imgurService.uploadImage(imageLocalPath);
+    const imageAnalysisText = await openaiService.analyzeImage(imageUrl);
+    await generalBotService.sendMessage(bot, chatId, imageAnalysisText, getKeyboardOptions());
+    utilsService.deleteFile(imageLocalPath);
+}
+
 const handlers = {
     handleTranscribeAction,
     handleTranslateAction,
@@ -135,6 +144,7 @@ const handlers = {
     handleSummarizeYoutubeVideoAction,
     handleSummarizeTiktokVideoAction,
     handleImageGenerationAction,
+    handleImageAnalyzerAction,
 };
 
 module.exports = {

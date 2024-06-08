@@ -67,9 +67,30 @@ async function createImage(prompt) {
         model: IMAGE_GENERATION_MODEL,
         prompt,
         n: 1,
-        size: "1024x1024",
+        size: '1024x1024',
     });
     return response.data[0].url;
+}
+
+async function analyzeImage(imageUrl) {
+    const response = await openai.chat.completions.create({
+        model: CHAT_COMPLETIONS_MODEL,
+        messages: [
+            {
+                role: 'user',
+                content: [
+                    { type: 'text', text: 'What’s in this image? What text do you see in the image?' },
+                    {
+                        type: 'image_url',
+                        image_url: {
+                            url: imageUrl,
+                        },
+                    },
+                ],
+            },
+        ],
+    });
+    return response.choices[0].message.content;
 }
 
 module.exports = {
@@ -78,4 +99,5 @@ module.exports = {
     getAudioFromText,
     getChatCompletion,
     createImage,
+    analyzeImage,
 };

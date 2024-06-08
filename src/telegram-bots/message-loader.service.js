@@ -79,6 +79,7 @@ async function withMessageLoader(bot, chatId, options, action) {
     } catch (err) {
         logger.error(withMessageLoader.name, `error - ${utilsService.getErrorMessage(err)}`);
         messageLoader.stopLoader();
+        throw err;
     } finally {
         messageLoader.stopLoader();
     }
