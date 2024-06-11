@@ -1,4 +1,43 @@
-check all error in prod
+check all errors in prod
 add validation to each request by array of inputs of each action
-turn voice pal service to a class and lose the handlers object
 video or audio? make it more generic instead of duplicated code
+
+
+
+
+
+> Matan Nave:
+Transcribe
+
+> Voice Pal:
+OK, send me an audio or video file you want me to transcribe
+
+> Matan Nave:
+שלום, אני מתן ואני גר בכפר סבא, אני אוהב לשחק כדורגל ואני אוהד את ריאל מדריד
+
+##########################################################################
+
+> Matan Nave:
+Summary of a YouTube Video
+
+> Voice Pal:
+OK, Send me a link to a youtube video and I will summarize it for you
+
+> Matan Nave:
+https://www.youtube.com/watch?v=UhBJPT7z_9A
+
+##########################################################################
+
+Saturday 0107 message X 2
+
+##########################################################################
+
+June 10 1509 image when asked image analyzer
+
+##########################################################################
+
+audio when asking text to speech
+
+##########################################################################
+
+text when asking transcription

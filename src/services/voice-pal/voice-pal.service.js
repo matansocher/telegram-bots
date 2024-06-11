@@ -8,6 +8,7 @@ const {
 } = require('./voice-pal.config');
 const voicePalUtils = require('./voice-pal.utils');
 const imgurService = require('../imgur.service');
+const googleTranslateService = require('../google-translate.service');
 const openaiService = require('../openai/openai.service');
 const tiktokDownloaderService = require('../tiktok-downloader.service');
 const userSelectionService = require('../user-selections.service');
@@ -54,7 +55,7 @@ class VoicePalService {
             audioFileLocalPath = await this.bot.downloadFile(audio.file_id, LOCAL_FILES_PATH);
         }
 
-        const resText = await voicePalUtils.transcribeAudioFile(audioFileLocalPath);
+        const resText = await openaiService.getTranscriptFromAudio(audioFileLocalPath);
         await generalBotService.sendMessage(this.bot, this.chatId, resText, voicePalUtils.getKeyboardOptions());
         await utilsService.deleteFile(audioFileLocalPath);
     }
@@ -64,7 +65,7 @@ class VoicePalService {
         let audioFileLocalPath = '';
 
         if (text) {
-            resText = await voicePalUtils.translateText(text)
+            resText = await googleTranslateService.getTranslationToEnglish(text);
         } else if (video && video.file_id) {
             const videoFileLocalPath = await this.bot.downloadFile(video.file_id, LOCAL_FILES_PATH);
             audioFileLocalPath = await utilsService.extractAudioFromVideo(videoFileLocalPath);
@@ -74,7 +75,7 @@ class VoicePalService {
         }
 
         if (audioFileLocalPath) {
-            resText = await voicePalUtils.translateAudioFile(audioFileLocalPath)
+            resText = await openaiService.getTranslationFromAudio(audioFileLocalPath);
             utilsService.deleteFile(audioFileLocalPath);
         }
 
@@ -82,7 +83,12 @@ class VoicePalService {
     }
 
     async handleTextToSpeechAction({ text }) {
-        const audioFilePath = await voicePalUtils.textToSpeech(text);
+        const result = await openaiService.getAudioFromText(text);
+
+        const audioFilePath = `${LOCAL_FILES_PATH}/text-to-speech-${new Date().getTime()}.mp3`;
+        const buffer = Buffer.from(await result.arrayBuffer());
+        await fs.writeFile(audioFilePath, buffer);
+
         await generalBotService.sendVoice(this.bot, this.chatId, audioFilePath, voicePalUtils.getKeyboardOptions());
         await utilsService.deleteFile(audioFilePath);
     }
@@ -111,7 +117,7 @@ class VoicePalService {
 
         const audioFilePath = `${LOCAL_FILES_PATH}/tiktok-summary-${new Date().getTime()}.mp3`;
         fs.writeFileSync(audioFilePath, audio)
-        const transcription = await voicePalUtils.transcribeAudioFile(audioFilePath);
+        const transcription = await openaiService.getTranscriptFromAudio(audioFilePath);
 
         const summaryTranscription = await openaiService.getChatCompletion(SUMMARY_PROMPTS.TIKTOK, transcription);
         await generalBotService.sendMessage(this.bot, this.chatId, summaryTranscription, voicePalUtils.getKeyboardOptions());
