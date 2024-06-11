@@ -101,7 +101,10 @@ class VoicePalService {
         if (!videoId) {
             await generalBotService.sendMessage(this.bot, this.chatId, NOT_FOUND_VIDEO_MESSAGES.YOUTUBE, voicePalUtils.getKeyboardOptions());
         }
-        const transcription = await youtubeTranscriptService.getYoutubeVideoTranscription(videoId);
+        const { transcription, errorMessage } = await youtubeTranscriptService.getYoutubeVideoTranscription(videoId);
+        if (errorMessage) {
+            await generalBotService.sendMessage(this.bot, this.chatId, errorMessage, voicePalUtils.getKeyboardOptions());
+        }
         const summaryTranscription = await openaiService.getChatCompletion(SUMMARY_PROMPTS.YOUTUBE, transcription);
         await generalBotService.sendMessage(this.bot, this.chatId, summaryTranscription, voicePalUtils.getKeyboardOptions());
     }

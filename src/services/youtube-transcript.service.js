@@ -2,17 +2,20 @@ const { YoutubeTranscript } = require('youtube-transcript');
 const utilsService = require('./utils.service');
 const logger = new (require('./logger.service.js'))(module.filename);
 
+const supportedLanguages = ['en', 'iw'];
+
 async function getYoutubeVideoTranscription(videoId) {
-    try {
-        logger.info(getYoutubeVideoTranscription.name, `start`);
-        const result = await YoutubeTranscript.fetchTranscript(videoId, { lang: 'en' });
-        const parsedResult = parseTranscriptResult(result);
-        logger.info(getYoutubeVideoTranscription.name, `end`);
-        return parsedResult;
-    } catch (err) {
-        logger.error(getYoutubeVideoTranscription.name, `err - ${utilsService.getErrorMessage(err)}`);
-        throw err;
+    logger.info(getYoutubeVideoTranscription.name, `start`);
+    const resultArr = await Promise.allSettled(supportedLanguages.map((lang) => YoutubeTranscript.fetchTranscript(videoId, { lang })));
+    const bestResult = resultArr.find((result) => result.status === 'fulfilled');
+    if (!bestResult) {
+        return {
+            transcription: null, errorMessage: `I am sorry but I did not find the transcription for this video. I support only english and hebrew videos for now.`,
+        }
     }
+    const transcription = parseTranscriptResult(bestResult.value);
+    logger.info(getYoutubeVideoTranscription.name, `end`);
+    return { transcription, errorMessage: null };
 }
 
 function parseTranscriptResult(result) {
