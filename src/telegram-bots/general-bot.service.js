@@ -1,5 +1,6 @@
 const { get: _get } = require('lodash');
 const utilsService = require('../services/utils.service');
+const {LOCAL_FILES_PATH} = require("../services/voice-pal/voice-pal.config");
 const logger = new (require('../services/logger.service.js'))(module.filename);
 
 function getMessageData(message) {
@@ -32,6 +33,32 @@ function getInlineKeyboardMarkup(inlineKeyboardButtons) {
     const inlineKeyboard = { inline_keyboard: [] };
     inlineKeyboardButtons.forEach(button => inlineKeyboard.inline_keyboard.push([button]));
     return { reply_markup: JSON.stringify(inlineKeyboard) };
+}
+
+async function downloadFile(bot, fileId, path) {
+    try {
+        return await bot.downloadFile(fileId, path);
+    } catch (err) {
+        logger.error(downloadFile.name, `err: ${utilsService.getErrorMessage(err)}`);
+        throw err;
+    }
+}
+
+async function downloadAudioFromVideoOrAudio(bot, { video, audio }) {
+    try {
+        let audioFileLocalPath = '';
+        if (video && video.file_id) {
+            const videoFileLocalPath = await downloadFile(video.file_id, LOCAL_FILES_PATH);
+            audioFileLocalPath = await utilsService.extractAudioFromVideo(videoFileLocalPath);
+            utilsService.deleteFile(videoFileLocalPath);
+        } else if (audio && audio.file_id) {
+            audioFileLocalPath = await downloadFile(audio.file_id, LOCAL_FILES_PATH);
+        }
+        return audioFileLocalPath;
+    } catch (err) {
+        logger.error(downloadAudioFromVideoOrAudio.name, `err: ${utilsService.getErrorMessage(err)}`);
+        throw err;
+    }
 }
 
 async function sendMessage(bot, chatId, messageText, form = {}) {
@@ -111,6 +138,8 @@ module.exports = {
     getMessageData,
     getCallbackQueryData,
     getInlineKeyboardMarkup,
+    downloadFile,
+    downloadAudioFromVideoOrAudio,
     sendMessage,
     editMessage,
     deleteMessage,

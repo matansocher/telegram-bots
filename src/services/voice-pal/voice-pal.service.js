@@ -46,15 +46,7 @@ class VoicePalService {
     }
 
     async handleTranscribeAction({ video, audio }) {
-        let audioFileLocalPath;
-        if (video && video.file_id) {
-            const videoFileLocalPath = await this.bot.downloadFile(video.file_id, LOCAL_FILES_PATH);
-            audioFileLocalPath = await utilsService.extractAudioFromVideo(videoFileLocalPath);
-            utilsService.deleteFile(videoFileLocalPath);
-        } else {
-            audioFileLocalPath = await this.bot.downloadFile(audio.file_id, LOCAL_FILES_PATH);
-        }
-
+        const audioFileLocalPath = await generalBotService.downloadAudioFromVideoOrAudio(this.bot, { video, audio });
         const resText = await openaiService.getTranscriptFromAudio(audioFileLocalPath);
         await generalBotService.sendMessage(this.bot, this.chatId, resText, voicePalUtils.getKeyboardOptions());
         await utilsService.deleteFile(audioFileLocalPath);
@@ -66,12 +58,8 @@ class VoicePalService {
 
         if (text) {
             resText = await googleTranslateService.getTranslationToEnglish(text);
-        } else if (video && video.file_id) {
-            const videoFileLocalPath = await this.bot.downloadFile(video.file_id, LOCAL_FILES_PATH);
-            audioFileLocalPath = await utilsService.extractAudioFromVideo(videoFileLocalPath);
-            utilsService.deleteFile(videoFileLocalPath);
         } else {
-            audioFileLocalPath = await this.bot.downloadFile(audio.file_id, LOCAL_FILES_PATH);
+            audioFileLocalPath = await generalBotService.downloadAudioFromVideoOrAudio(this.bot, { video, audio });
         }
 
         if (audioFileLocalPath) {
@@ -130,7 +118,7 @@ class VoicePalService {
     }
 
     async handleImageAnalyzerAction({ photo }) {
-        const imageLocalPath = await this.bot.downloadFile(photo[photo.length - 1].file_id, LOCAL_FILES_PATH);
+        const imageLocalPath = await generalBotService.downloadFile(photo[photo.length - 1].file_id, LOCAL_FILES_PATH);
         const imageUrl = await imgurService.uploadImage(imageLocalPath);
         const imageAnalysisText = await openaiService.analyzeImage(imageUrl);
         await generalBotService.sendMessage(this.bot, this.chatId, imageAnalysisText, voicePalUtils.getKeyboardOptions());
