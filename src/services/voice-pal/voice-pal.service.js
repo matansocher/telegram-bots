@@ -17,6 +17,7 @@ const mongoConfig = require('../mongo/mongo.config');
 const mongoService = require('../mongo/mongo.service');
 const generalBotService = require('../../telegram-bots/general-bot.service');
 const utilsService = require('../utils.service');
+const messageLoaderService = require('../../telegram-bots/message-loader.service');
 
 class VoicePalService {
     constructor(bot, chatId) {
@@ -38,8 +39,14 @@ class VoicePalService {
         }
 
         // maybe add the validation here
-        // also, consider adding the withMessageLoader here
-        await this[userAction.handler]({ text, audio, video, photo });
+
+        if (userAction && userAction.showLoader) { // showLoader
+            await messageLoaderService.withMessageLoader(this.bot, this.chatId, { cycleDuration: 5000 }, async () => {
+                await this[userAction.handler]({ text, audio, video, photo });
+            });
+        } else {
+            await this[userAction.handler]({ text, audio, video, photo });
+        }
 
         mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES[userAction], { chatId: this.chatId });
         // userSelectionService.removeCurrentUserAction(this.chatId);

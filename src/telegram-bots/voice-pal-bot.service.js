@@ -3,7 +3,6 @@ const { BOTS } = require('../config');
 const { ANALYTIC_EVENT_NAMES, VOICE_PAL_OPTIONS, INITIAL_BOT_RESPONSE } = require('../services/voice-pal/voice-pal.config');
 const bot = new TelegramBot(process.env.VOICE_PAL_TELEGRAM_BOT_TOKEN, { polling: true });
 const generalBotService = require('./general-bot.service');
-const messageLoaderService = require('./message-loader.service');
 const utilsService = require('../services/utils.service');
 const VoicePalService = require('../services/voice-pal/voice-pal.service');
 const voicePalUtils = require('../services/voice-pal/voice-pal.utils');
@@ -49,13 +48,7 @@ async function messageHandler(functionName, message) {
             await voicePalService.handleActionSelection(text);
         } else {
             const userAction = userSelectionService.getCurrentUserAction(chatId);
-            if (userAction && userAction.showLoader) { // showLoader
-                await messageLoaderService.withMessageLoader(bot, chatId, { cycleDuration: 5000 }, async () => {
-                    await voicePalService.handleAction(message, userAction);
-                });
-            } else {
-                await voicePalService.handleAction(message, userAction);
-            }
+            await voicePalService.handleAction(message, userAction);
         }
 
         logger.info(functionName, `${logBody} - success`);
