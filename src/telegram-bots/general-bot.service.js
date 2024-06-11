@@ -11,7 +11,7 @@ function getMessageData(message) {
         lastName: _get(message, 'from.last_name', ''),
         username: _get(message, 'from.username', ''),
         text: _get(message, 'text', '') || _get(message, 'caption', ''),
-        audio: _get(message, 'audio', null) || _get(message, 'voice', {}),
+        audio: _get(message, 'audio', null) || _get(message, 'voice', null),
         video: _get(message, 'video', null),
         photo: _get(message, 'photo', null),
         date: _get(message, 'date', ''),
@@ -48,11 +48,11 @@ async function downloadAudioFromVideoOrAudio(bot, { video, audio }) {
     try {
         let audioFileLocalPath = '';
         if (video && video.file_id) {
-            const videoFileLocalPath = await downloadFile(video.file_id, LOCAL_FILES_PATH);
+            const videoFileLocalPath = await downloadFile(bot, video.file_id, LOCAL_FILES_PATH);
             audioFileLocalPath = await utilsService.extractAudioFromVideo(videoFileLocalPath);
             utilsService.deleteFile(videoFileLocalPath);
         } else if (audio && audio.file_id) {
-            audioFileLocalPath = await downloadFile(audio.file_id, LOCAL_FILES_PATH);
+            audioFileLocalPath = await downloadFile(bot, audio.file_id, LOCAL_FILES_PATH);
         }
         return audioFileLocalPath;
     } catch (err) {

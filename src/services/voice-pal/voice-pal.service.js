@@ -38,7 +38,10 @@ class VoicePalService {
             return generalBotService.sendMessage(this.bot, this.chatId, `Please select an action first.`);
         }
 
-        // maybe add the validation here
+        const inputErrorMessage = voicePalUtils.validateActionWithMessage(userAction, { text, audio, video, photo });
+        if (inputErrorMessage) {
+            return generalBotService.sendMessage(this.bot, this.chatId, inputErrorMessage, voicePalUtils.getKeyboardOptions());
+        }
 
         if (userAction && userAction.showLoader) { // showLoader
             await messageLoaderService.withMessageLoader(this.bot, this.chatId, { cycleDuration: 5000 }, async () => {
@@ -125,7 +128,7 @@ class VoicePalService {
     }
 
     async handleImageAnalyzerAction({ photo }) {
-        const imageLocalPath = await generalBotService.downloadFile(photo[photo.length - 1].file_id, LOCAL_FILES_PATH);
+        const imageLocalPath = await generalBotService.downloadFile(this.bot, photo[photo.length - 1].file_id, LOCAL_FILES_PATH);
         const imageUrl = await imgurService.uploadImage(imageLocalPath);
         const imageAnalysisText = await openaiService.analyzeImage(imageUrl);
         await generalBotService.sendMessage(this.bot, this.chatId, imageAnalysisText, voicePalUtils.getKeyboardOptions());

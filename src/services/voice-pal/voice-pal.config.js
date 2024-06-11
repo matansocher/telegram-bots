@@ -2,12 +2,20 @@ const LOCAL_FILES_PATH = './assets/downloads';
 
 const INITIAL_BOT_RESPONSE = `Hi {firstName}!\n\nI'm a bot that can help you with translations, transcriptions of text, audio and video files\n\nJust send me the data and I will do my thing`;
 
+const POSSIBLE_INPUTS = {
+    TEXT: 'text',
+    AUDIO: 'audio',
+    VIDEO: 'video',
+    PHOTO: 'photo',
+};
+
 const VOICE_PAL_OPTIONS = {
     TRANSCRIBE: {
         displayName: 'Transcribe',
         selectedActionResponse: 'OK, send me an audio or video file you want me to transcribe',
         handler: 'handleTranscribeAction',
         analyticsEventName: 'TRANSCRIBE',
+        possibleInputs: [POSSIBLE_INPUTS.VIDEO, POSSIBLE_INPUTS.AUDIO],
         showLoader: true,
     },
     TRANSLATE: {
@@ -15,6 +23,7 @@ const VOICE_PAL_OPTIONS = {
         selectedActionResponse: 'OK, send me a text, audio or a video file you want me to translate',
         handler: 'handleTranslateAction',
         analyticsEventName: 'TRANSLATE',
+        possibleInputs: [POSSIBLE_INPUTS.TEXT, POSSIBLE_INPUTS.VIDEO, POSSIBLE_INPUTS.AUDIO],
         showLoader: false,
     },
     TEXT_TO_SPEECH: {
@@ -22,6 +31,7 @@ const VOICE_PAL_OPTIONS = {
         selectedActionResponse: 'OK, Send me the text you want me to convert to speech',
         handler: 'handleTextToSpeechAction',
         analyticsEventName: 'TEXT_TO_SPEECH',
+        possibleInputs: [POSSIBLE_INPUTS.TEXT],
         showLoader: true,
     },
     SUMMARY_TEXT: {
@@ -29,6 +39,7 @@ const VOICE_PAL_OPTIONS = {
         selectedActionResponse: 'OK, Send me the text, and I will summarize it for you',
         handler: 'handleSummarizeTextAction',
         analyticsEventName: 'SUMMARY_TEXT',
+        possibleInputs: [POSSIBLE_INPUTS.TEXT],
         showLoader: true,
     },
     SUMMARY_YOUTUBE_VIDEO: {
@@ -36,6 +47,7 @@ const VOICE_PAL_OPTIONS = {
         selectedActionResponse: 'OK, Send me a link to a youtube video and I will summarize it for you',
         handler: 'handleSummarizeYoutubeVideoAction',
         analyticsEventName: 'SUMMARY_YOUTUBE_VIDEO',
+        possibleInputs: [POSSIBLE_INPUTS.TEXT],
         showLoader: true,
     },
     SUMMARY_TIKTOK_VIDEO: {
@@ -43,6 +55,7 @@ const VOICE_PAL_OPTIONS = {
         selectedActionResponse: 'OK, Send me a link to a tiktok video and I will summarize it for you',
         handler: 'handleSummarizeTiktokVideoAction',
         analyticsEventName: 'SUMMARY_TIKTOK_VIDEO',
+        possibleInputs: [POSSIBLE_INPUTS.TEXT],
         showLoader: true,
     },
     // IMAGE_GENERATION: {
@@ -50,6 +63,7 @@ const VOICE_PAL_OPTIONS = {
     //     selectedActionResponse: 'OK, Send me the description of the image and I will create it for you',
     //     handler: 'handleImageGenerationAction',
     //     analyticsEventName: 'IMAGE_GENERATION',
+    //     possibleInputs: [POSSIBLE_INPUTS.TEXT],
     //     showLoader: true,
     // },
     IMAGE_ANALYZER: {
@@ -57,6 +71,7 @@ const VOICE_PAL_OPTIONS = {
         selectedActionResponse: 'OK, Send me an image and I will analyze it for you',
         handler: 'handleImageAnalyzerAction',
         analyticsEventName: 'IMAGE_ANALYZER',
+        possibleInputs: [POSSIBLE_INPUTS.PHOTO],
         showLoader: true,
     },
 };
@@ -88,6 +103,7 @@ const NOT_FOUND_VIDEO_MESSAGES = {
 module.exports = {
     LOCAL_FILES_PATH,
     VOICE_PAL_OPTIONS,
+    POSSIBLE_INPUTS,
     INITIAL_BOT_RESPONSE,
     SUMMARY_PROMPTS,
     NOT_FOUND_VIDEO_MESSAGES,

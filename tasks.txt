@@ -1,5 +1,5 @@
 check all errors in prod
-add validation to each request by array of inputs of each action
+error handling
 
 
 
