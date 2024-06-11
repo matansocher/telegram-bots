@@ -5,7 +5,7 @@ const bot = new TelegramBot(process.env.VOICE_PAL_TELEGRAM_BOT_TOKEN, { polling:
 const generalBotService = require('./general-bot.service');
 const messageLoaderService = require('./message-loader.service');
 const utilsService = require('../services/utils.service');
-const voicePalService = require('../services/voice-pal/voice-pal.service');
+const VoicePalService = require('../services/voice-pal/voice-pal.service');
 const voicePalUtils = require('../services/voice-pal/voice-pal.utils');
 const mongoService = require('../services/mongo/mongo.service');
 const mongoConfig = require('../services/mongo/mongo.config');
@@ -43,17 +43,18 @@ async function messageHandler(functionName, message) {
     try {
         logger.info(functionName, `${logBody} - start`);
 
+        const voicePalService = new VoicePalService(bot, chatId);
         const availableActions = Object.keys(VOICE_PAL_OPTIONS).map(option => VOICE_PAL_OPTIONS[option].displayName);
         if (availableActions.includes(text)) {
-            await voicePalService.handleActionSelection(bot, chatId, text);
+            await voicePalService.handleActionSelection(text);
         } else {
             const userAction = userSelectionService.getCurrentUserAction(chatId);
             if (userAction && userAction.showLoader) { // showLoader
                 await messageLoaderService.withMessageLoader(bot, chatId, { cycleDuration: 5000 }, async () => {
-                    await voicePalService.handleAction(bot, message, userAction);
+                    await voicePalService.handleAction(message, userAction);
                 });
             } else {
-                await voicePalService.handleAction(bot, message, userAction);
+                await voicePalService.handleAction(message, userAction);
             }
         }
 
