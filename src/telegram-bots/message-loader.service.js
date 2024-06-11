@@ -52,7 +52,7 @@ class MessageLoader {
         if (this.cycleIterationIndex === 0) {
             messagePromise = generalBotService.sendMessage(this.bot, this.chatId, messageText);
         } else {
-            messagePromise = generalBotService.editMessage(this.bot, this.chatId, this.loaderMessageId, messageText);
+            messagePromise = generalBotService.editMessageText(this.bot, this.chatId, this.loaderMessageId, messageText);
         }
         generalBotService.setBotTyping(this.bot, this.chatId);
 

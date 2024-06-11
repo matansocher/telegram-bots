@@ -70,11 +70,11 @@ async function sendMessage(bot, chatId, messageText, form = {}) {
     }
 }
 
-async function editMessage(bot, chatId, messageId, messageText) {
+async function editMessageText(bot, chatId, messageId, messageText) {
     try {
         return await bot.editMessageText(messageText, { chat_id: chatId, message_id: messageId });
     } catch (err) {
-        logger.error(editMessage.name, `err: ${utilsService.getErrorMessage(err)}`);
+        logger.error(editMessageText.name, `err: ${utilsService.getErrorMessage(err)}`);
         throw err;
     }
 }
@@ -83,7 +83,7 @@ async function deleteMessage(bot, chatId, messageId) {
     try {
         await bot.deleteMessage(chatId, messageId);
     } catch (err) {
-        logger.error(editMessage.name, `err: ${utilsService.getErrorMessage(err)}`);
+        logger.error(deleteMessage.name, `err: ${utilsService.getErrorMessage(err)}`);
     }
 }
 
@@ -141,7 +141,7 @@ module.exports = {
     downloadFile,
     downloadAudioFromVideoOrAudio,
     sendMessage,
-    editMessage,
+    editMessageText,
     deleteMessage,
     sendAudio,
     sendVoice,

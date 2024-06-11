@@ -7,4 +7,4 @@ Saturday 0107 message X 2
 
 ##########################################################################
 
-June 10 1509 image when asked image analyzer
+June 10 1509 image when asked image analyzer - it is an image with text, so the on message event is triggered twice
