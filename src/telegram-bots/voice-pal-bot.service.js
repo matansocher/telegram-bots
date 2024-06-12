@@ -3,6 +3,7 @@ const { BOTS } = require('../config');
 const { ANALYTIC_EVENT_NAMES, VOICE_PAL_OPTIONS, INITIAL_BOT_RESPONSE } = require('../services/voice-pal/voice-pal.config');
 const bot = new TelegramBot(process.env.VOICE_PAL_TELEGRAM_BOT_TOKEN, { polling: true });
 const generalBotService = require('./general-bot.service');
+const MessageAggregator = require('./messages-aggregator.service');
 const utilsService = require('../services/utils.service');
 const VoicePalService = require('../services/voice-pal/voice-pal.service');
 const voicePalUtils = require('../services/voice-pal/voice-pal.utils');
@@ -31,13 +32,17 @@ async function startHandler(message) {
     }
 }
 
-bot.on('message', async (message) => messageHandler('message listener', message));
 
-async function messageHandler(functionName, message) {
+const messageAggregator = new MessageAggregator(handlerMessage);
+
+bot.on('message', (message) => messageAggregator.handleIncomingMessage(message));
+
+async function handlerMessage(message) {
+    const functionName = 'message listener';
     const { chatId, firstName, lastName, text  } = generalBotService.getMessageData(message);
     const logBody = `chatId: ${chatId}, firstname: ${firstName}, lastname: ${lastName}`;
 
-    if (text === '/start') return
+    if (text === '/start') return;
 
     try {
         logger.info(functionName, `${logBody} - start`);

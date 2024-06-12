@@ -1,4 +1,4 @@
-const fs = require('fs');
+const fs = require('fs').promises;
 const {
     ANALYTIC_EVENT_NAMES,
     LOCAL_FILES_PATH,

@@ -1,7 +1,8 @@
 const { translate } = require('@vitalets/google-translate-api');
 
 async function getTranslationToEnglish(text) {
-    return translate(text, { to: 'en' });
+    const result = await translate(text, { to: 'en' });
+    return result.text;
 }
 
 module.exports = {
