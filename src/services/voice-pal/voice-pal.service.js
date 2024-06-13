@@ -58,7 +58,7 @@ class VoicePalService {
     async handleTranscribeAction({ video, audio }) {
         const audioFileLocalPath = await generalBotService.downloadAudioFromVideoOrAudio(this.bot, { video, audio });
         const resText = await openaiService.getTranscriptFromAudio(audioFileLocalPath);
-        await generalBotService.sendMessage(this.bot, this.chatId, resText, voicePalUtils.getKeyboardOptions());
+        await generalBotService.sendMessage(this.bot, this.chatId, resText.text, voicePalUtils.getKeyboardOptions());
         await utilsService.deleteFile(audioFileLocalPath);
     }
 
