@@ -61,10 +61,11 @@ async function getSubscription(chatId, restaurant) {
     return subscriptionCollection.findOne(filter);
 }
 
-async function addSubscription(chatId, restaurant) {
+async function addSubscription(chatId, restaurant, restaurantPhoto) {
     const subscription = {
         chatId,
         restaurant,
+        restaurantPhoto,
         isActive: true,
         createdAt: new Date().getTime(),
     };

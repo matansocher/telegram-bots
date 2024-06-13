@@ -54,7 +54,8 @@ function alertSubscribers(subscriptions) {
                 ];
                 const inlineKeyboardMarkup = generalBotService.getInlineKeyboardMarkup(inlineKeyboardButtons);
                 const replyText = `${restaurant.name} is now open!, go ahead and order!`;
-                promisesArr.push(generalBotService.sendMessage(bot, subscription.chatId, replyText, inlineKeyboardMarkup), getKeyboardOptions());
+                // promisesArr.push(generalBotService.sendMessage(bot, subscription.chatId, replyText, inlineKeyboardMarkup), getKeyboardOptions());
+                promisesArr.push(generalBotService.sendPhoto(bot, subscription.chatId, subscription.restaurantPhoto, { ...inlineKeyboardMarkup, caption: replyText }));
                 promisesArr.push(mongoService.archiveSubscription(subscription.chatId, subscription.restaurant));
                 promisesArr.push(mongoService.sendAnalyticLog(mongoConfig.WOLT.NAME, ANALYTIC_EVENT_NAMES.SUBSCRIPTION_FULFILLED, { chatId: subscription.chatId, data: restaurant.name }));
             });
@@ -239,7 +240,7 @@ async function handleCallbackAddSubscription(chatId, restaurant, existingSubscri
             replyText = `No Problem, you will be notified once ${restaurant} is open.\n\n` +
                 `FYI: If the venue won\'t open soon, registration will be removed after ${woltConfig.SUBSCRIPTION_EXPIRATION_HOURS} hours.\n\n` +
                 `You can search and register for another restaurant if you like.`;
-            await mongoService.addSubscription(chatId, restaurant);
+            await mongoService.addSubscription(chatId, restaurant, restaurantDetails.photo);
         }
     }
 

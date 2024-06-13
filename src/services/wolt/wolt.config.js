@@ -24,7 +24,27 @@ const RESTAURANT_BASE_URL = 'https://consumer-api.wolt.com/order-xp/web/v1/venue
 const RESTAURANT_LINK_BASE_URL = 'https://wolt.com/en/isr/{area}/restaurant/{slug}';
 const CITIES_BASE_URL = 'https://restaurant-api.wolt.com/v1/cities';
 
-const CITIES_SLUGS_SUPPORTED = ['hasharon', 'herzliya', 'tel-aviv'];
+const CITIES_SLUGS_SUPPORTED = ['hasharon', 'tel-aviv'];
+// 'afula-emek-yizrael-area',
+// 'ashdod',
+// 'ashkelon',
+// 'beer-sheva',
+// 'eilat',
+// 'ness-ziona---rehovot',
+// 'haifa',
+// 'jerusalem',
+// 'karmiel-area',
+// 'kiryat-shmona-area',
+// 'mevaseret-zion-area',
+// 'modiin',
+// 'nazareth---nof-hagalil-area',
+// 'netanya',
+// 'pardes-hanna',
+// 'petah-tikva',
+// 'rishon-lezion',
+// 'rosh-pinna---zefat-area',
+// 'yavne',
+// 'yokneam',
 
 const WOLT_BOT_OPTIONS = {
     START: '/start',

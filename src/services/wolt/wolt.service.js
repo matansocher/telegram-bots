@@ -22,6 +22,7 @@ async function getRestaurantsList() {
                 isOnline: restaurant.venue.online,
                 slug: restaurant.venue.slug,
                 area: restaurant.area,
+                photo: restaurant.image.url,
             };
         });
     } catch (err) {

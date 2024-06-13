@@ -33,11 +33,11 @@ async function startHandler(message) {
 }
 
 
-const messageAggregator = new MessageAggregator(handlerMessage);
+const messageAggregator = new MessageAggregator(handleMessage);
 
 bot.on('message', (message) => messageAggregator.handleIncomingMessage(message));
 
-async function handlerMessage(message) {
+async function handleMessage(message) {
     const functionName = 'message listener';
     const { chatId, firstName, lastName, text  } = generalBotService.getMessageData(message);
     const logBody = `chatId: ${chatId}, firstname: ${firstName}, lastname: ${lastName}`;
