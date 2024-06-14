@@ -21,10 +21,10 @@ async function startHandler(message) {
     logger.info(functionName, `${logBody} - start`);
 
     try {
-        mongoService.saveUserDetails(mongoConfig.VOICE_PAL.NAME, { telegramUserId, chatId, firstName, lastName, username });
+        mongoService.saveVoicePalUserDetails({ telegramUserId, chatId, firstName, lastName, username });
         const replyText = INITIAL_BOT_RESPONSE.replace('{firstName}', firstName || username || '');
         await generalBotService.sendMessage(bot, chatId, replyText, voicePalUtils.getKeyboardOptions());
-        mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES.Start, { chatId })
+        mongoService.sendVoicePalAnalyticLog(ANALYTIC_EVENT_NAMES.Start, { chatId })
         logger.info(functionName, `${logBody} - success`);
     } catch (err) {
         logger.error(functionName, `${logBody} - error - ${utilsService.getErrorMessage(err)}`);

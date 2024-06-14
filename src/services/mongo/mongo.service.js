@@ -93,38 +93,36 @@ async function getMultipleResults(cursor) {
     return results;
 }
 
-async function saveUserDetails(dbName, { telegramUserId, chatId, firstName, lastName, username }) {
+async function saveWoltUserDetails({ telegramUserId, chatId, firstName, lastName, username }) {
     try {
-        const collection = getUserCollection(dbName);
-        const existingUser = await collection.findOne({ telegramUserId });
+        const existingUser = await userCollectionWolt.findOne({ telegramUserId });
         if (existingUser) {
             return;
         }
         const user = { telegramUserId, chatId, firstName, lastName, username };
-        return collection.insertOne(user);
+        return userCollectionWolt.insertOne(user);
     } catch (err) {
-        logger.error(saveUserDetails.name, `err: ${utilsService.getErrorMessage(err)}`);
+        logger.error(saveWoltUserDetails.name, `err: ${utilsService.getErrorMessage(err)}`);
     }
 }
 
-function getUserCollection(dbName) {
-    switch (dbName) {
-        case mongoConfig.WOLT.NAME:
-            return userCollectionWolt;
-        case mongoConfig.VOICE_PAL.NAME:
-            return userCollectionVoicePal;
-        case mongoConfig.REMINDERS.NAME:
-            return userCollectionReminders;
-        default:
-            return null;
+async function saveVoicePalUserDetails({ telegramUserId, chatId, firstName, lastName, username }) {
+    try {
+        const existingUser = await userCollectionVoicePal.findOne({ telegramUserId });
+        if (existingUser) {
+            return;
+        }
+        const user = { telegramUserId, chatId, firstName, lastName, username };
+        return userCollectionVoicePal.insertOne(user);
+    } catch (err) {
+        logger.error(saveVoicePalUserDetails.name, `err: ${utilsService.getErrorMessage(err)}`);
     }
 }
 
-function sendAnalyticLog(dbName, eventName, { chatId, data = null }) {
+function sendWoltAnalyticLog(eventName, { chatId, data = null }) {
     if (!config.isProd) {
         return;
     }
-    const collection = getAnalyticsCollection(dbName);
     const log = {
         chatId,
         data,
@@ -133,20 +131,22 @@ function sendAnalyticLog(dbName, eventName, { chatId, data = null }) {
         // error,
         createdAt: new Date().getTime(),
     };
-    return collection.insertOne(log);
+    return analyticLogCollectionWolt.insertOne(log);
 }
 
-function getAnalyticsCollection(dbName) {
-    switch (dbName) {
-        case mongoConfig.WOLT.NAME:
-            return analyticLogCollectionWolt;
-        case mongoConfig.VOICE_PAL.NAME:
-            return analyticLogCollectionVoicePal;
-        case mongoConfig.REMINDERS.NAME:
-            return analyticLogCollectionReminders;
-        default:
-            return null;
+function sendVoicePalAnalyticLog(eventName, { chatId, data = null }) {
+    if (!config.isProd) {
+        return;
     }
+    const log = {
+        chatId,
+        data,
+        eventName,
+        // message,
+        // error,
+        createdAt: new Date().getTime(),
+    };
+    return analyticLogCollectionWolt.insertOne(log);
 }
 
 module.exports = {
@@ -155,6 +155,8 @@ module.exports = {
     addSubscription,
     archiveSubscription,
     getExpiredSubscriptions,
-    saveUserDetails,
-    sendAnalyticLog,
+    saveWoltUserDetails,
+    saveVoicePalUserDetails,
+    sendWoltAnalyticLog,
+    sendVoicePalAnalyticLog,
 }

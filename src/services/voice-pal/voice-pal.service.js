@@ -13,7 +13,6 @@ const openaiService = require('../openai/openai.service');
 const tiktokDownloaderService = require('../tiktok-downloader.service');
 const userSelectionService = require('../user-selections.service');
 const youtubeTranscriptService = require('../youtube-transcript.service');
-const mongoConfig = require('../mongo/mongo.config');
 const mongoService = require('../mongo/mongo.service');
 const generalBotService = require('../../telegram-bots/general-bot.service');
 const utilsService = require('../utils.service');
@@ -51,7 +50,7 @@ class VoicePalService {
             await this[userAction.handler]({ text, audio, video, photo });
         }
 
-        mongoService.sendAnalyticLog(mongoConfig.VOICE_PAL.NAME, ANALYTIC_EVENT_NAMES[userAction], { chatId: this.chatId });
+        mongoService.sendVoicePalAnalyticLog(ANALYTIC_EVENT_NAMES[userAction], { chatId: this.chatId });
         // userSelectionService.removeCurrentUserAction(this.chatId);
     }
 
