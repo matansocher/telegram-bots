@@ -1,6 +1,6 @@
 const TelegramBot = require('node-telegram-bot-api');
 const { BOTS } = require('../config');
-const mongoService = require('../services/mongo/mongo.service');
+const mongoService = require('../services/mongo/wolt/mongo.service');
 const generalBotService = require('./general-bot.service');
 const woltService = require('../services/wolt/wolt.service');
 const woltConfig = require('../services/wolt/wolt.config');
@@ -56,7 +56,7 @@ function alertSubscribers(subscriptions) {
                 // promisesArr.push(generalBotService.sendMessage(bot, subscription.chatId, replyText, inlineKeyboardMarkup), getKeyboardOptions());
                 promisesArr.push(generalBotService.sendPhoto(bot, subscription.chatId, subscription.restaurantPhoto, { ...inlineKeyboardMarkup, caption: replyText }));
                 promisesArr.push(mongoService.archiveSubscription(subscription.chatId, subscription.restaurant));
-                promisesArr.push(mongoService.sendWoltAnalyticLog(ANALYTIC_EVENT_NAMES.SUBSCRIPTION_FULFILLED, { chatId: subscription.chatId, data: restaurant.name }));
+                promisesArr.push(mongoService.sendAnalyticLog(ANALYTIC_EVENT_NAMES.SUBSCRIPTION_FULFILLED, { chatId: subscription.chatId, data: restaurant.name }));
             });
         });
         return Promise.all(promisesArr);
@@ -75,7 +75,7 @@ async function cleanExpiredSubscriptions() {
             if (currentHour >= woltConfig.MIN_HOUR_TO_ALERT_USER && currentHour <= woltConfig.MAX_HOUR_TO_ALERT_USER) { // let user know that subscription was removed only between 8am to 11pm
                 promisesArr.push(generalBotService.sendMessage(bot, subscription.chatId, `Subscription for ${subscription.restaurant} was removed since it didn't open for the last ${woltConfig.SUBSCRIPTION_EXPIRATION_HOURS} hours`), getKeyboardOptions());
             }
-            promisesArr.push(mongoService.sendWoltAnalyticLog(ANALYTIC_EVENT_NAMES.SUBSCRIPTION_FAILED, { chatId: subscription.chatId, data: subscription.restaurant }));
+            promisesArr.push(mongoService.sendAnalyticLog(ANALYTIC_EVENT_NAMES.SUBSCRIPTION_FAILED, { chatId: subscription.chatId, data: subscription.restaurant }));
         });
         await Promise.all(promisesArr);
     } catch (err) {
@@ -109,10 +109,10 @@ async function startHandler(message) {
 
     try {
         logger.info(startHandler.name, `${logBody} - start`);
-        mongoService.saveWoltUserDetails({ chatId, telegramUserId, firstName, lastName, username });
+        mongoService.saveUserDetails({ chatId, telegramUserId, firstName, lastName, username });
         const replyText = INITIAL_BOT_RESPONSE.replace('{firstName}', firstName || username || '');
         await generalBotService.sendMessage(bot, chatId, replyText, getKeyboardOptions());
-        mongoService.sendWoltAnalyticLog(ANALYTIC_EVENT_NAMES.START, { chatId })
+        mongoService.sendAnalyticLog(ANALYTIC_EVENT_NAMES.START, { chatId })
         logger.info(startHandler.name, `${logBody} - success`);
     } catch (err) {
         logger.error(startHandler.name, `${logBody} - error - ${utilsService.getErrorMessage(err)}`);
@@ -142,7 +142,7 @@ async function showHandler(message) {
             return generalBotService.sendMessage(bot, chatId, subscription.restaurant, inlineKeyboardMarkup);
         });
         await Promise.all(promisesArr);
-        mongoService.sendWoltAnalyticLog(ANALYTIC_EVENT_NAMES.SHOW, { chatId })
+        mongoService.sendAnalyticLog(ANALYTIC_EVENT_NAMES.SHOW, { chatId })
         logger.info(showHandler.name, `${logBody} - success`);
     } catch (err) {
         logger.error(showHandler.name, `error - ${utilsService.getErrorMessage(err)}`);
@@ -163,7 +163,7 @@ async function textHandler(message) {
     logger.info(textHandler.name, `${logBody} - start`);
 
     try {
-        mongoService.sendWoltAnalyticLog(ANALYTIC_EVENT_NAMES.SEARCH, { data: restaurant, chatId });
+        mongoService.sendAnalyticLog(ANALYTIC_EVENT_NAMES.SEARCH, { data: restaurant, chatId });
 
         const filteredRestaurants = getFilteredRestaurants(restaurant);
         if (!filteredRestaurants.length) {
@@ -243,7 +243,7 @@ async function handleCallbackAddSubscription(chatId, restaurant, existingSubscri
         }
     }
 
-    mongoService.sendWoltAnalyticLog(ANALYTIC_EVENT_NAMES.SUBSCRIBE, { data: restaurant, chatId });
+    mongoService.sendAnalyticLog(ANALYTIC_EVENT_NAMES.SUBSCRIBE, { data: restaurant, chatId });
     await generalBotService.sendMessage(bot, chatId, replyText, form);
 }
 
@@ -257,7 +257,7 @@ async function handleCallbackRemoveSubscription(chatId, restaurant, existingSubs
         replyText = `It seems you don\'t have a subscription for ${restaurant}.\n\n` +
             `You can search and register for another restaurant if you like`;
     }
-    mongoService.sendWoltAnalyticLog(ANALYTIC_EVENT_NAMES.UNSUBSCRIBE, { data: restaurant, chatId });
+    mongoService.sendAnalyticLog(ANALYTIC_EVENT_NAMES.UNSUBSCRIBE, { data: restaurant, chatId });
     return await generalBotService.sendMessage(bot, chatId, replyText, getKeyboardOptions());
 }
 

@@ -7,7 +7,7 @@ const MessageAggregator = require('./messages-aggregator.service');
 const utilsService = require('../services/utils.service');
 const VoicePalService = require('../services/voice-pal/voice-pal.service');
 const voicePalUtils = require('../services/voice-pal/voice-pal.utils');
-const mongoService = require('../services/mongo/mongo.service');
+const mongoService = require('../services/mongo/voice-pal/mongo.service');
 const mongoConfig = require('../services/mongo/mongo.config');
 const userSelectionService = require('../services/user-selections.service');
 const logger = new (require('../services/logger.service.js'))(module.filename);
@@ -21,10 +21,10 @@ async function startHandler(message) {
     logger.info(functionName, `${logBody} - start`);
 
     try {
-        mongoService.saveVoicePalUserDetails({ telegramUserId, chatId, firstName, lastName, username });
+        mongoService.saveUserDetails({ telegramUserId, chatId, firstName, lastName, username });
         const replyText = INITIAL_BOT_RESPONSE.replace('{firstName}', firstName || username || '');
         await generalBotService.sendMessage(bot, chatId, replyText, voicePalUtils.getKeyboardOptions());
-        mongoService.sendVoicePalAnalyticLog(ANALYTIC_EVENT_NAMES.Start, { chatId })
+        mongoService.sendAnalyticLog(ANALYTIC_EVENT_NAMES.Start, { chatId })
         logger.info(functionName, `${logBody} - success`);
     } catch (err) {
         logger.error(functionName, `${logBody} - error - ${utilsService.getErrorMessage(err)}`);
