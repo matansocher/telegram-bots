@@ -1,1 +1,2 @@
-
+better notebook
+wolt - don't refresh every minute if no active subscriptions - save the last refresh time, and if somebody asks for a restaurant, fetch the restaurants and if the last refresh time is more than 1 minute ago, refresh the data
