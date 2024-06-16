@@ -51,7 +51,7 @@ async function addSubscription(chatId, restaurant, restaurantPhoto) {
         restaurant,
         restaurantPhoto,
         isActive: true,
-        createdAt: new Date().getTime(),
+        createdAt: new Date(),
     };
     return subscriptionCollection.insertOne(subscription);
 }
@@ -100,7 +100,7 @@ function sendAnalyticLog(eventName, { chatId, data = null }) {
         eventName,
         // message,
         // error,
-        createdAt: new Date().getTime(),
+        createdAt: new Date(),
     };
     return analyticLogCollection.insertOne(log);
 }

@@ -8,8 +8,7 @@ const utilsService = require('../services/utils.service');
 const VoicePalService = require('../services/voice-pal/voice-pal.service');
 const voicePalUtils = require('../services/voice-pal/voice-pal.utils');
 const mongoService = require('../services/mongo/voice-pal/mongo.service');
-const mongoConfig = require('../services/mongo/mongo.config');
-const userSelectionService = require('../services/user-selections.service');
+const userSelectionService = require('../services/voice-pal/user-selections.service');
 const logger = new (require('../services/logger.service.js'))(module.filename);
 
 bot.onText(/\/start/, startHandler);

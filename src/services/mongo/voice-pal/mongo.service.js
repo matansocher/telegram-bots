@@ -48,7 +48,7 @@ function sendAnalyticLog(eventName, { chatId, data = null }) {
         eventName,
         // message,
         // error,
-        createdAt: new Date().getTime(),
+        createdAt: new Date(),
     };
     return analyticLogCollection.insertOne(log);
 }

@@ -7,6 +7,9 @@ const BOTS = {
     VOICE_PAL: {
         name: 'Voice Pal Bot',
     },
+    NOTEBOOK: {
+        name: 'Notebook Bot',
+    },
 };
 
 module.exports = {

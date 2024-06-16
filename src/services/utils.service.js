@@ -51,9 +51,27 @@ function getQueryParams(urlString) {
     return queryParams;
 }
 
+function objectToQueryParams(obj) {
+    return Object.keys(obj)
+        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]))
+        .join('&');
+}
+
+function queryParamsToObject(queryString) {
+    return queryString
+        .split('&')
+        .map(param => param.split('='))
+        .reduce((acc, [key, value]) => {
+            acc[decodeURIComponent(key)] = decodeURIComponent(value);
+            return acc;
+        }, {});
+}
+
 module.exports = {
     getErrorMessage,
     deleteFile,
     extractAudioFromVideo,
     getQueryParams,
+    objectToQueryParams,
+    queryParamsToObject,
 };
