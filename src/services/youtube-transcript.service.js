@@ -18,6 +18,17 @@ async function getYoutubeVideoTranscription(videoId) {
     return { transcription, errorMessage: null };
 }
 
+function getYoutubeVideoIdFromUrl(url) {
+    // shorts
+    if (url.includes('shorts')) {
+        const cleanedUrl = url.split('?')[0];
+        const parts = cleanedUrl.split('/');
+        return parts[parts.length - 1];
+    }
+    // web
+    return utilsService.getQueryParams(url).v;
+}
+
 function parseTranscriptResult(result) {
     return result.map((item) => {
         const { text, duration, offset } = item;
@@ -35,4 +46,5 @@ function getTimestampInMinutesFromSeconds(seconds) {
 
 module.exports = {
     getYoutubeVideoTranscription,
+    getYoutubeVideoIdFromUrl,
 };

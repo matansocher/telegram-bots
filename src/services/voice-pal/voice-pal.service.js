@@ -96,7 +96,7 @@ class VoicePalService {
     }
 
     async handleSummarizeYoutubeVideoAction({ text }) {
-        const videoId = utilsService.getQueryParams(text).v;
+        const videoId = youtubeTranscriptService.getYoutubeVideoIdFromUrl(text);
         if (!videoId) {
             await generalBotService.sendMessage(this.bot, this.chatId, NOT_FOUND_VIDEO_MESSAGES.YOUTUBE, voicePalUtils.getKeyboardOptions());
         }
