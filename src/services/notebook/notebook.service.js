@@ -8,8 +8,8 @@ const notebookUtils = require('./notebook.utils');
 const userSelectionService = require('./user-selections.service');
 const mongoService = require('../mongo/notebook/mongo.service');
 const generalBotService = require('../../telegram-bots/general-bot.service');
-const {LOCAL_FILES_PATH} = require("../voice-pal/voice-pal.config");
-const imgurService = require("../imgur.service");
+const { LOCAL_FILES_PATH } = require('../voice-pal/voice-pal.config');
+const imgurService = require('../imgur.service');
 
 class NotebookService {
     constructor(bot, chatId) {

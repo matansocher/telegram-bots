@@ -1,5 +1,5 @@
 const axios = require('axios');
-const { ndown, tikdown } = require("nayan-media-downloader")
+const { ndown, tikdown } = require('nayan-media-downloader')
 const utilsService = require('./utils.service');
 const logger = new (require('./logger.service.js'))(module.filename);
 

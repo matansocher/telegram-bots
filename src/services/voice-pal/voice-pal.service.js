@@ -140,7 +140,7 @@ class VoicePalService {
             if (!audioBuffer) {
                 await generalBotService.sendMessage(this.bot, this.chatId, NOT_FOUND_VIDEO_MESSAGES.TIKTOK, voicePalUtils.getKeyboardOptions());
             }
-            const audioFilePath = `${LOCAL_FILES_PATH}/tiktok-video-${new Date().getTime()}.mp4`;
+            const audioFilePath = `${LOCAL_FILES_PATH}/tiktok-audio-${new Date().getTime()}.mp3`;
             await fs.writeFile(audioFilePath, audioBuffer)
 
             const transcription = await openaiService.getTranscriptFromAudio(audioFilePath);
