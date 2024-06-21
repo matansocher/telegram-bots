@@ -36,6 +36,16 @@ async function extractAudioFromVideo(videoFilePath) {
     });
 }
 
+async function saveVideoBytesArray(videoBytesArray, videoFilePath) {
+    try {
+        const buffer = Buffer.from(videoBytesArray);
+        await fs.writeFile(videoFilePath, buffer);
+        return videoFilePath;
+    } catch (err) {
+        logger.error(saveVideoBytesArray.name, `Error saving file at ${videoFilePath}: ${utilsService.getErrorMessage(err)}`);
+    }
+}
+
 function getErrorMessage(error) {
     return error instanceof Error ? error.message : JSON.stringify(error);
 }
@@ -51,9 +61,28 @@ function getQueryParams(urlString) {
     return queryParams;
 }
 
+function objectToQueryParams(obj) {
+    return Object.keys(obj)
+        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(obj[key]))
+        .join('&');
+}
+
+function queryParamsToObject(queryString) {
+    return queryString
+        .split('&')
+        .map(param => param.split('='))
+        .reduce((acc, [key, value]) => {
+            acc[decodeURIComponent(key)] = decodeURIComponent(value);
+            return acc;
+        }, {});
+}
+
 module.exports = {
     getErrorMessage,
     deleteFile,
     extractAudioFromVideo,
+    saveVideoBytesArray,
     getQueryParams,
+    objectToQueryParams,
+    queryParamsToObject,
 };

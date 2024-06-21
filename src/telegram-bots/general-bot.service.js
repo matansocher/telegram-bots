@@ -1,6 +1,6 @@
-const { get: _get } = require('lodash');
+const { get: _get, chunk: _chunk } = require('lodash');
 const utilsService = require('../services/utils.service');
-const {LOCAL_FILES_PATH} = require("../services/voice-pal/voice-pal.config");
+const { LOCAL_FILES_PATH } = require('../services/voice-pal/voice-pal.config');
 const logger = new (require('../services/logger.service.js'))(module.filename);
 
 function getMessageData(message) {
@@ -13,7 +13,7 @@ function getMessageData(message) {
         text: _get(message, 'text', '') || _get(message, 'caption', ''),
         audio: _get(message, 'audio', null) || _get(message, 'voice', null),
         video: _get(message, 'video', null),
-        photo: _get(message, 'photo', null),
+        photo: _get(message, 'photo', null) || _get(message, 'sticker', null),
         date: _get(message, 'date', ''),
     };
 }
@@ -25,13 +25,15 @@ function getCallbackQueryData(callbackQuery) {
         date: _get(callbackQuery, 'message.date', ''),
         firstName: _get(callbackQuery, 'from.first_name', ''),
         lastName: _get(callbackQuery, 'from.last_name', ''),
+        text: _get(callbackQuery, 'message.text', ''),
         data: _get(callbackQuery, 'data', ''),
     };
 }
 
-function getInlineKeyboardMarkup(inlineKeyboardButtons) {
+function getInlineKeyboardMarkup(inlineKeyboardButtons, numberOfColumnsPerRow = 1) {
     const inlineKeyboard = { inline_keyboard: [] };
-    inlineKeyboardButtons.forEach(button => inlineKeyboard.inline_keyboard.push([button]));
+    inlineKeyboardButtons.forEach(button => inlineKeyboard.inline_keyboard.push(button));
+    inlineKeyboard.inline_keyboard = _chunk(inlineKeyboard.inline_keyboard, numberOfColumnsPerRow);
     return { reply_markup: JSON.stringify(inlineKeyboard) };
 }
 
@@ -132,6 +134,14 @@ function botErrorHandler(botName, handlerName, error) {
     logger.info(`${botName} bot - ${handlerName}`, `code: ${code}, message: ${message}`);
 }
 
+function decodeCallbackData(data) {
+    return utilsService.queryParamsToObject(data);
+}
+
+function encodeCallbackData(data) {
+    return utilsService.objectToQueryParams(data);
+}
+
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 
 module.exports = {
@@ -149,5 +159,7 @@ module.exports = {
     sendPhoto,
     setBotTyping,
     botErrorHandler,
+    decodeCallbackData,
+    encodeCallbackData,
     sleep,
 };

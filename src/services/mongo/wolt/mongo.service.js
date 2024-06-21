@@ -1,22 +1,15 @@
 const { MongoClient } = require('mongodb');
-const config = require('../../config');
+const config = require('../../../config');
 const mongoConfig = require('./mongo.config');
-const woltConfig = require('../wolt/wolt.config');
-const utilsService = require('../utils.service');
-const logger = new (require('../logger.service'))(module.filename);
+const woltConfig = require('../../wolt/wolt.config');
+const utilsService = require('../../utils.service');
+const logger = new (require('../../logger.service'))(module.filename);
 
 const loggerConnectFunctionName = 'mongo';
 
 let subscriptionCollection;
-let userCollectionWolt;
-let analyticLogCollectionWolt;
-
-let userCollectionVoicePal;
-let analyticLogCollectionVoicePal;
-
-let reminderCollection;
-let userCollectionReminders;
-let analyticLogCollectionReminders;
+let userCollection;
+let analyticLogCollection;
 
 const client = new MongoClient(mongoConfig.MONGO_DB_URL);
 
@@ -27,17 +20,8 @@ const client = new MongoClient(mongoConfig.MONGO_DB_URL);
 
         const WOLT_DB = client.db(mongoConfig.WOLT.NAME);
         subscriptionCollection = WOLT_DB.collection(mongoConfig.WOLT.COLLECTIONS.SUBSCRIPTIONS);
-        userCollectionWolt = WOLT_DB.collection(mongoConfig.WOLT.COLLECTIONS.USER);
-        analyticLogCollectionWolt = WOLT_DB.collection(mongoConfig.WOLT.COLLECTIONS.ANALYTIC_LOGS);
-
-        const VOICE_PAL_DB = client.db(mongoConfig.VOICE_PAL.NAME);
-        userCollectionVoicePal = VOICE_PAL_DB.collection(mongoConfig.VOICE_PAL.COLLECTIONS.USER);
-        analyticLogCollectionVoicePal = VOICE_PAL_DB.collection(mongoConfig.VOICE_PAL.COLLECTIONS.ANALYTIC_LOGS);
-
-        const REMINDERS_DB = client.db(mongoConfig.REMINDERS.NAME);
-        reminderCollection = REMINDERS_DB.collection(mongoConfig.REMINDERS.COLLECTIONS.REMINDER);
-        userCollectionReminders = REMINDERS_DB.collection(mongoConfig.REMINDERS.COLLECTIONS.USER);
-        analyticLogCollectionReminders = REMINDERS_DB.collection(mongoConfig.REMINDERS.COLLECTIONS.ANALYTIC_LOGS);
+        userCollection = WOLT_DB.collection(mongoConfig.WOLT.COLLECTIONS.USER);
+        analyticLogCollection = WOLT_DB.collection(mongoConfig.WOLT.COLLECTIONS.ANALYTIC_LOGS);
     } catch (err) {
         logger.error(loggerConnectFunctionName, 'Failed to connect to mongo server', err);
         throw err;
@@ -67,7 +51,7 @@ async function addSubscription(chatId, restaurant, restaurantPhoto) {
         restaurant,
         restaurantPhoto,
         isActive: true,
-        createdAt: new Date().getTime(),
+        createdAt: new Date(),
     };
     return subscriptionCollection.insertOne(subscription);
 }
@@ -93,60 +77,32 @@ async function getMultipleResults(cursor) {
     return results;
 }
 
-async function saveUserDetails(dbName, { telegramUserId, chatId, firstName, lastName, username }) {
+async function saveUserDetails({ telegramUserId, chatId, firstName, lastName, username }) {
     try {
-        const collection = getUserCollection(dbName);
-        const existingUser = await collection.findOne({ telegramUserId });
+        const existingUser = await userCollection.findOne({ telegramUserId });
         if (existingUser) {
             return;
         }
         const user = { telegramUserId, chatId, firstName, lastName, username };
-        return collection.insertOne(user);
+        return userCollection.insertOne(user);
     } catch (err) {
         logger.error(saveUserDetails.name, `err: ${utilsService.getErrorMessage(err)}`);
     }
 }
 
-function getUserCollection(dbName) {
-    switch (dbName) {
-        case mongoConfig.WOLT.NAME:
-            return userCollectionWolt;
-        case mongoConfig.VOICE_PAL.NAME:
-            return userCollectionVoicePal;
-        case mongoConfig.REMINDERS.NAME:
-            return userCollectionReminders;
-        default:
-            return null;
-    }
-}
-
-function sendAnalyticLog(dbName, eventName, { chatId, data = null }) {
+function sendAnalyticLog(eventName, { chatId, data = null }) {
     if (!config.isProd) {
         return;
     }
-    const collection = getAnalyticsCollection(dbName);
     const log = {
         chatId,
         data,
         eventName,
         // message,
         // error,
-        createdAt: new Date().getTime(),
+        createdAt: new Date(),
     };
-    return collection.insertOne(log);
-}
-
-function getAnalyticsCollection(dbName) {
-    switch (dbName) {
-        case mongoConfig.WOLT.NAME:
-            return analyticLogCollectionWolt;
-        case mongoConfig.VOICE_PAL.NAME:
-            return analyticLogCollectionVoicePal;
-        case mongoConfig.REMINDERS.NAME:
-            return analyticLogCollectionReminders;
-        default:
-            return null;
-    }
+    return analyticLogCollection.insertOne(log);
 }
 
 module.exports = {

@@ -1,4 +1,4 @@
-const { VOICE_PAL_OPTIONS } = require('./voice-pal/voice-pal.config');
+const { VOICE_PAL_OPTIONS } = require('./voice-pal.config');
 const userActions = {};
 
 function getCurrentUserAction(chatId) {

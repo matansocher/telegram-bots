@@ -18,8 +18,8 @@ async function getTranscriptFromAudio(audioFilePath, language) {
     const file = fs.createReadStream(audioFilePath);
     return openai.audio.transcriptions.create({
         file,
-        language,
         model: SOUND_MODEL,
+        ...(!!language && { language }),
     });
 }
 
