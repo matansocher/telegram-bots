@@ -58,6 +58,22 @@ const VOICE_PAL_OPTIONS = {
         possibleInputs: [POSSIBLE_INPUTS.TEXT],
         showLoader: true,
     },
+    SUMMARY_INSTAGRAM_VIDEO: {
+        displayName: 'Summary of a Instagram Video',
+        selectedActionResponse: 'OK, Send me a link to an instagram video and I will summarize it for you',
+        handler: 'handleSummarizeMetaVideoAction',
+        analyticsEventName: 'SUMMARY_INSTAGRAM_VIDEO',
+        possibleInputs: [POSSIBLE_INPUTS.TEXT],
+        showLoader: true,
+    },
+    SUMMARY_FACEBOOK_VIDEO: {
+        displayName: 'Summary of a Facebook Video',
+        selectedActionResponse: 'OK, Send me a link to an facebook video and I will summarize it for you',
+        handler: 'handleSummarizeMetaVideoAction',
+        analyticsEventName: 'SUMMARY_FACEBOOK_VIDEO',
+        possibleInputs: [POSSIBLE_INPUTS.TEXT],
+        showLoader: true,
+    },
     // IMAGE_GENERATION: {
     //     displayName: 'Image Generation',
     //     selectedActionResponse: 'OK, Send me the description of the image and I will create it for you',
@@ -86,18 +102,13 @@ const ANALYTIC_EVENT_NAMES = {
     ),
 };
 
-const SUMMARY_PROMPTS = {
-    TEXT: 'You are a helpful assistant. You will be provided with a text from the user.' +
-        'Please summarize it. You can also split the summary into section, and add to each section its header.',
-    YOUTUBE: 'You are a helpful assistant. You will be provided with a transcription of a youtube video from the user, the includes all the sentences in the video and the timestamp.' +
-        'Please summarize the transcript. You can also split the summary into section, and add to each section its header and also the time frame the content of the section.',
-    TIKTOK: 'You are a helpful assistant. You will be provided with a transcription of a video from the user, the includes all the sentences in the video and the timestamp.' +
-        'Please summarize the transcript. You can also split the summary into section, and add to each section its header',
-};
+const SUMMARY_PROMPT = 'You are a helpful assistant. You will be provided with a text from the user.' +
+    'Please summarize the transcript. You can also split the summary into section, and add to each section its header.';
 
 const NOT_FOUND_VIDEO_MESSAGES = {
     YOUTUBE: 'I am having trouble finding the youtube video you shared. please send me a link in this format - https://www.youtube.com/watch?v=xxxxxxxxxxxx',
     TIKTOK: 'I am having trouble finding the tiktok video you shared. please send me a link in this format - https://www.tiktok.com/@{username}/video/xxxxxxxxxxxx',
+    META: 'I am having trouble finding the instagram video you shared',
 };
 
 module.exports = {
@@ -105,7 +116,7 @@ module.exports = {
     VOICE_PAL_OPTIONS,
     POSSIBLE_INPUTS,
     INITIAL_BOT_RESPONSE,
-    SUMMARY_PROMPTS,
+    SUMMARY_PROMPT,
     NOT_FOUND_VIDEO_MESSAGES,
     ANALYTIC_EVENT_NAMES,
 };
