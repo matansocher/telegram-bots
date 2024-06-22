@@ -1,3 +1,5 @@
+const { BOT_BROADCAST_ACTIONS } = require('../../telegram-bots/general-bot.config');
+
 const LOCAL_FILES_PATH = './assets/downloads';
 
 const INITIAL_BOT_RESPONSE = `Hi {firstName}!\n\nI'm a bot that can help you with translations, transcriptions of text, audio and video files\n\nJust send me the data and I will do my thing`;
@@ -33,6 +35,7 @@ const VOICE_PAL_OPTIONS = {
         analyticsEventName: 'TEXT_TO_SPEECH',
         possibleInputs: [POSSIBLE_INPUTS.TEXT],
         showLoader: true,
+        loaderType: BOT_BROADCAST_ACTIONS.UPLOADING_VOICE,
     },
     SUMMARY_TEXT: {
         displayName: 'Summarize Text',

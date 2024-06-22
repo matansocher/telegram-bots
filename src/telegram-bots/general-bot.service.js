@@ -1,4 +1,5 @@
 const { get: _get, chunk: _chunk } = require('lodash');
+const { BOT_BROADCAST_ACTIONS } = require('./general-bot.config');
 const utilsService = require('../services/utils.service');
 const { LOCAL_FILES_PATH } = require('../services/voice-pal/voice-pal.config');
 const logger = new (require('../services/logger.service.js'))(module.filename);
@@ -121,9 +122,9 @@ async function sendPhoto(bot, chatId, imageUrl, form = {}) {
     }
 }
 
-function setBotTyping(bot, chatId, form = {}) {
+function setBotTyping(bot, chatId, action = BOT_BROADCAST_ACTIONS.TYPING) {
     try {
-        bot.sendChatAction(chatId, 'typing', form);
+        bot.sendChatAction(chatId, action);
     } catch (err) {
         logger.error(setBotTyping.name, `err: ${utilsService.getErrorMessage(err)}`);
     }

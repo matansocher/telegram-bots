@@ -19,6 +19,7 @@ class MessageLoader {
         this.bot = bot;
         this.chatId = chatId;
         this.options = options;
+        this.loadingAction = options.loadingAction;
 
         this.timeoutId = null;
         this.loaderMessageId = null;
@@ -28,7 +29,7 @@ class MessageLoader {
 
     waitForMessage() {
         try {
-            generalBotService.setBotTyping(this.bot, this.chatId);
+            generalBotService.setBotTyping(this.bot, this.chatId, this.loadingAction);
             this.cycleInitiator();
         } catch (err) {
             logger.error(this.waitForMessage.name, `error - ${utilsService.getErrorMessage(err)}`);
@@ -54,7 +55,7 @@ class MessageLoader {
         } else {
             messagePromise = generalBotService.editMessageText(this.bot, this.chatId, this.loaderMessageId, messageText);
         }
-        generalBotService.setBotTyping(this.bot, this.chatId);
+        generalBotService.setBotTyping(this.bot, this.chatId, this.loadingAction);
 
         const messageRes = await messagePromise;
         this.loaderMessageId = (messageRes && messageRes.message_id) ? messageRes.message_id : this.loaderMessageId;

@@ -46,7 +46,7 @@ class VoicePalService {
         let analyticAction = ANALYTIC_EVENT_NAMES[userAction];
         try {
             if (userAction && userAction.showLoader) { // showLoader
-                await messageLoaderService.withMessageLoader(this.bot, this.chatId, { cycleDuration: 5000 }, async () => {
+                await messageLoaderService.withMessageLoader(this.bot, this.chatId, { cycleDuration: 5000, loadingAction: userAction.loaderType }, async () => {
                     await this[userAction.handler]({ text, audio, video, photo });
                 });
             } else {
