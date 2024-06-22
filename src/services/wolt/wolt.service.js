@@ -3,17 +3,24 @@ const woltConfig = require('./wolt.config');
 const utilsService = require('../utils.service');
 const logger = new (require('../logger.service.js'))(module.filename);
 
-let restaurantsList = [];
+let restaurantsList = {
+    restaurants: [],
+    lastUpdated: 0,
+};
 
 function getRestaurants() {
-    return restaurantsList;
+    return restaurantsList.restaurants;
+}
+
+function getLastUpdated() {
+    return restaurantsList.lastUpdated;
 }
 
 async function refreshRestaurants() {
     try {
         const restaurants = await getRestaurantsList();
         if (restaurants.length) {
-            restaurantsList = [...restaurants];
+            restaurantsList = { restaurants, lastUpdated: new Date().getTime() };
             logger.info(refreshRestaurants.name, 'Restaurants list was refreshed successfully');
         }
     } catch (err) {
@@ -104,6 +111,7 @@ function getRestaurantLink(restaurant) {
 
 module.exports = {
     getRestaurants,
+    getLastUpdated,
     refreshRestaurants,
     enrichRestaurants,
     getRestaurantLink,

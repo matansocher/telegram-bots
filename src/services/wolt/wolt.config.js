@@ -12,6 +12,8 @@ const SECONDS_BETWEEN_RESTAURANTS_REFRESH_OPTIONS = {
     IDLE: 60 * 15,
 };
 
+const TOO_OLD_LIST_THRESHOLD_MS = 60000;
+
 const INITIAL_BOT_RESPONSE = `Hi {firstName}!\n\nI'm a bot that can alert you when a wolt restaurant opens\n\nYou can enter the restaurant name you want to check\n\nTo show current notification registrations please write: /show\n\n`;
 
 const HOURS_DIFFERENCE_FROM_UTC = 2;
@@ -100,6 +102,7 @@ module.exports = {
     MAX_NUM_OF_RESTAURANTS_TO_SHOW,
     SUBSCRIPTION_EXPIRATION_HOURS,
     SECONDS_BETWEEN_RESTAURANTS_REFRESH_OPTIONS,
+    TOO_OLD_LIST_THRESHOLD_MS,
     INITIAL_BOT_RESPONSE,
     HOURS_DIFFERENCE_FROM_UTC,
     MIN_HOUR_TO_ALERT_USER,

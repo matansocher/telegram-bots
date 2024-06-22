@@ -12,14 +12,13 @@ const logger = new (require('../services/logger.service'))(module.filename);
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ worker $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 (async function startInterval() {
-    await woltService.refreshRestaurants();
+    await cleanExpiredSubscriptions();
     const subscriptions = await mongoService.getActiveSubscriptions();
-    // get the names of the restaurants that are online
-    if (subscriptions.length) {
+    if (subscriptions && subscriptions.length) {
+        await woltService.refreshRestaurants();
         await alertSubscribers(subscriptions);
     }
 
-    await cleanExpiredSubscriptions();
     const secondsToNextRefresh = getSecondsToNextRefresh();
     setTimeout(async () => {
         await startInterval();
@@ -35,9 +34,9 @@ function getSecondsToNextRefresh() {
 function alertSubscribers(subscriptions) {
     try {
         const restaurantsWithSubscriptionNames = subscriptions.map(subscription => subscription.restaurant);
-        const filteredRestaurants = woltService.getRestaurants().filter(restaurant => restaurantsWithSubscriptionNames.includes(restaurant.name) && restaurant.isOnline);
+        const subscribedAndOnlineRestaurants = woltService.getRestaurants().filter(restaurant => restaurantsWithSubscriptionNames.includes(restaurant.name) && restaurant.isOnline);
         const promisesArr = [];
-        filteredRestaurants.forEach(restaurant => {
+        subscribedAndOnlineRestaurants.forEach(restaurant => {
             const relevantSubscriptions = subscriptions.filter(subscription => subscription.restaurant === restaurant.name);
             relevantSubscriptions.forEach(subscription => {
                 const restaurantLinkUrl = woltService.getRestaurantLink(restaurant);
@@ -141,12 +140,16 @@ async function textHandler(message) {
     try {
         mongoService.sendAnalyticLog(ANALYTIC_EVENT_NAMES.SEARCH, { data: restaurant, chatId });
 
-        const filteredRestaurants = getFilteredRestaurants(restaurant);
-        if (!filteredRestaurants.length) {
+        const isLastUpdatedTooOld = new Date().getTime() - woltService.getLastUpdated() > woltConfig.TOO_OLD_LIST_THRESHOLD_MS;
+        if (isLastUpdatedTooOld) { // lst updated is less than a minute
+            await woltService.refreshRestaurants();
+        }
+        const matchedRestaurants = getFilteredRestaurantsByName(restaurant);
+        if (!matchedRestaurants.length) {
             const replyText = `I am sorry, I didn\'t find any restaurants matching your search - '${restaurant}'`;
             return await generalBotService.sendMessage(bot, chatId, replyText, woltUtils.getKeyboardOptions());
         }
-        const restaurants = await woltService.enrichRestaurants(filteredRestaurants);
+        const restaurants = await woltService.enrichRestaurants(matchedRestaurants);
         const inlineKeyboardButtons = restaurants.map(restaurant => {
             const isAvailableComment = restaurant.isOnline ? 'Open' : restaurant.isOpen ? 'Busy' : 'Closed';
             return {
@@ -237,7 +240,7 @@ async function handleCallbackRemoveSubscription(chatId, restaurant, existingSubs
     return await generalBotService.sendMessage(bot, chatId, replyText, woltUtils.getKeyboardOptions());
 }
 
-function getFilteredRestaurants(searchInput) {
+function getFilteredRestaurantsByName(searchInput) {
     const restaurants = [...woltService.getRestaurants()];
     return restaurants.filter(restaurant => {
         return restaurant.name.toLowerCase().includes(searchInput.toLowerCase());
