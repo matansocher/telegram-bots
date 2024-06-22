@@ -11,7 +11,8 @@ const LOADER_MESSAGES = [
     'Just a little bit longer...',
     'Hang tight, almost there...',
     'Any second now...',
-    'Thanks for your patience...'
+    'Thanks for your patience...',
+    'This is my last loading message, if there is no response, show it to Matan 😁',
 ];
 
 class MessageLoader {
