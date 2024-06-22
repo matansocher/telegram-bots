@@ -84,9 +84,6 @@ class VoicePalService {
                 resText = await googleTranslateService.getTranslationToEnglish(text);
             } else {
                 audioFileLocalPath = await generalBotService.downloadAudioFromVideoOrAudio(this.bot, { video, audio });
-            }
-
-            if (audioFileLocalPath) {
                 resText = await openaiService.getTranslationFromAudio(audioFileLocalPath);
                 utilsService.deleteFile(audioFileLocalPath);
             }
