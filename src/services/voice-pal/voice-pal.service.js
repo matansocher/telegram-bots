@@ -1,9 +1,10 @@
 const fs = require('fs').promises;
 const {
     ANALYTIC_EVENT_NAMES,
+    ANALYTIC_EVENT_STATES,
     LOCAL_FILES_PATH,
-    SUMMARY_PROMPT,
     NOT_FOUND_VIDEO_MESSAGES,
+    SUMMARY_PROMPT,
     VOICE_PAL_OPTIONS,
 } = require('./voice-pal.config');
 const voicePalUtils = require('./voice-pal.utils');
@@ -25,10 +26,21 @@ class VoicePalService {
         this.chatId = chatId;
     }
 
-    async handleActionSelection(selection) {
-        userSelectionService.setCurrentUserAction(this.chatId, selection);
+    async handleActionSelection(selection, { telegramUserId, chatId, firstName, lastName, username }) {
         const relevantAction = Object.keys(VOICE_PAL_OPTIONS).find(option => VOICE_PAL_OPTIONS[option].displayName === selection);
-        await generalBotService.sendMessage(this.bot, this.chatId, VOICE_PAL_OPTIONS[relevantAction].selectedActionResponse, voicePalUtils.getKeyboardOptions());
+
+        let replyText = VOICE_PAL_OPTIONS[relevantAction].selectedActionResponse;
+        if (selection === VOICE_PAL_OPTIONS.START.displayName) {
+            mongoService.saveUserDetails({ telegramUserId, chatId, firstName, lastName, username });
+            replyText = replyText.replace('{name}', firstName || username || '');
+        } else {
+            userSelectionService.setCurrentUserAction(this.chatId, selection);
+        }
+
+        const analyticAction = ANALYTIC_EVENT_NAMES[selection];
+        mongoService.sendAnalyticLog(`${analyticAction} - ${ANALYTIC_EVENT_STATES.SET_ACTION}`, { chatId: this.chatId });
+
+        await generalBotService.sendMessage(this.bot, this.chatId, replyText, voicePalUtils.getKeyboardOptions());
     }
 
     async handleAction(message, userAction) {
@@ -43,7 +55,7 @@ class VoicePalService {
             return generalBotService.sendMessage(this.bot, this.chatId, inputErrorMessage, voicePalUtils.getKeyboardOptions());
         }
 
-        let analyticAction = ANALYTIC_EVENT_NAMES[userAction];
+        const analyticAction = ANALYTIC_EVENT_NAMES[userAction];
         try {
             if (userAction && userAction.showLoader) { // showLoader
                 await messageLoaderService.withMessageLoader(this.bot, this.chatId, { cycleDuration: 5000, loadingAction: userAction.loaderType }, async () => {
@@ -53,12 +65,12 @@ class VoicePalService {
                 await this[userAction.handler]({ text, audio, video, photo });
             }
 
-            mongoService.sendAnalyticLog(analyticAction, { chatId: this.chatId });
+            mongoService.sendAnalyticLog(`${analyticAction} - ${ANALYTIC_EVENT_STATES.FULFILLED}`, { chatId: this.chatId });
             // userSelectionService.removeCurrentUserAction(this.chatId);
         } catch (err) {
             const errorMessage = utilsService.getErrorMessage(err);
             logger.error(this.handleAction.name, `error: ${errorMessage}`);
-            mongoService.sendAnalyticLog(`${analyticAction} - ERROR`, { chatId: this.chatId, error: errorMessage });
+            mongoService.sendAnalyticLog(`${analyticAction} - ${ANALYTIC_EVENT_STATES.ERROR}`, { chatId: this.chatId, error: errorMessage });
             throw err;
         }
     }
