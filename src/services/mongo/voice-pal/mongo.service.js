@@ -38,7 +38,7 @@ async function saveUserDetails({ telegramUserId, chatId, firstName, lastName, us
     }
 }
 
-function sendAnalyticLog(eventName, { chatId, data = null }) {
+function sendAnalyticLog(eventName, { chatId, data = null, error = '' }) {
     if (!config.isProd) {
         return;
     }
@@ -46,8 +46,7 @@ function sendAnalyticLog(eventName, { chatId, data = null }) {
         chatId,
         data,
         eventName,
-        // message,
-        // error,
+        ...(!!error && { error }),
         createdAt: new Date(),
     };
     return analyticLogCollection.insertOne(log);

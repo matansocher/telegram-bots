@@ -43,16 +43,24 @@ class VoicePalService {
             return generalBotService.sendMessage(this.bot, this.chatId, inputErrorMessage, voicePalUtils.getKeyboardOptions());
         }
 
-        if (userAction && userAction.showLoader) { // showLoader
-            await messageLoaderService.withMessageLoader(this.bot, this.chatId, { cycleDuration: 5000 }, async () => {
+        let analyticAction = ANALYTIC_EVENT_NAMES[userAction];
+        try {
+            if (userAction && userAction.showLoader) { // showLoader
+                await messageLoaderService.withMessageLoader(this.bot, this.chatId, { cycleDuration: 5000 }, async () => {
+                    await this[userAction.handler]({ text, audio, video, photo });
+                });
+            } else {
                 await this[userAction.handler]({ text, audio, video, photo });
-            });
-        } else {
-            await this[userAction.handler]({ text, audio, video, photo });
-        }
+            }
 
-        mongoService.sendAnalyticLog(ANALYTIC_EVENT_NAMES[userAction], { chatId: this.chatId });
-        // userSelectionService.removeCurrentUserAction(this.chatId);
+            mongoService.sendAnalyticLog(analyticAction, { chatId: this.chatId });
+            // userSelectionService.removeCurrentUserAction(this.chatId);
+        } catch (err) {
+            const errorMessage = utilsService.getErrorMessage(err);
+            logger.error(this.handleAction.name, `error: ${errorMessage}`);
+            mongoService.sendAnalyticLog(`${analyticAction} - ERROR`, { chatId: this.chatId, error: errorMessage });
+            throw err;
+        }
     }
 
     async handleTranscribeAction({ video, audio }) {
