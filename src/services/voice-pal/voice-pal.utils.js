@@ -1,10 +1,17 @@
 const { VOICE_PAL_OPTIONS, POSSIBLE_INPUTS} = require('./voice-pal.config');
 
 function getKeyboardOptions() {
+    const options = {};
+    for (const key in VOICE_PAL_OPTIONS) {
+        if (VOICE_PAL_OPTIONS[key].hideFromKeyboard !== true) {
+            options[key] = VOICE_PAL_OPTIONS[key];
+        }
+    }
+
     return {
         reply_markup: {
-            keyboard: Object.keys(VOICE_PAL_OPTIONS).map(option => {
-                return [{ text: VOICE_PAL_OPTIONS[option].displayName }];
+            keyboard: Object.keys(options).map(option => {
+                return [{ text: options[option].displayName }];
             }),
             resize_keyboard: true,
         },

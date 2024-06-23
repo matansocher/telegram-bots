@@ -1,6 +1,6 @@
-const LOCAL_FILES_PATH = './assets/downloads';
+const { BOT_BROADCAST_ACTIONS } = require('../../telegram-bots/general-bot.config');
 
-const INITIAL_BOT_RESPONSE = `Hi {firstName}!\n\nI'm a bot that can help you with translations, transcriptions of text, audio and video files\n\nJust send me the data and I will do my thing`;
+const LOCAL_FILES_PATH = './assets/downloads';
 
 const POSSIBLE_INPUTS = {
     TEXT: 'text',
@@ -10,6 +10,12 @@ const POSSIBLE_INPUTS = {
 };
 
 const VOICE_PAL_OPTIONS = {
+    START: {
+        displayName: '/start',
+        selectedActionResponse: `Hi {name}!\n\nI'm a bot that can help you with translations, transcriptions of text, audio and video files\n\nJust send me the data and I will do my thing`,
+        analyticsEventName: 'START',
+        hideFromKeyboard: true,
+    },
     TRANSCRIBE: {
         displayName: 'Transcribe',
         selectedActionResponse: 'OK, send me an audio or video file you want me to transcribe',
@@ -33,6 +39,7 @@ const VOICE_PAL_OPTIONS = {
         analyticsEventName: 'TEXT_TO_SPEECH',
         possibleInputs: [POSSIBLE_INPUTS.TEXT],
         showLoader: true,
+        loaderType: BOT_BROADCAST_ACTIONS.UPLOADING_VOICE,
     },
     SUMMARY_TEXT: {
         displayName: 'Summarize Text',
@@ -93,13 +100,18 @@ const VOICE_PAL_OPTIONS = {
 };
 
 const ANALYTIC_EVENT_NAMES = {
-    Start: 'START',
     ...Object.fromEntries(
         Object.keys(VOICE_PAL_OPTIONS).map(option => [
             VOICE_PAL_OPTIONS[option].displayName,
             VOICE_PAL_OPTIONS[option].analyticsEventName,
         ])
     ),
+};
+
+const ANALYTIC_EVENT_STATES = {
+    SET_ACTION: 'SET_ACTION',
+    FULFILLED: 'FULFILLED',
+    ERROR: 'ERROR',
 };
 
 const SUMMARY_PROMPT = 'You are a helpful assistant. You will be provided with a text from the user.' +
@@ -115,8 +127,8 @@ module.exports = {
     LOCAL_FILES_PATH,
     VOICE_PAL_OPTIONS,
     POSSIBLE_INPUTS,
-    INITIAL_BOT_RESPONSE,
     SUMMARY_PROMPT,
     NOT_FOUND_VIDEO_MESSAGES,
     ANALYTIC_EVENT_NAMES,
+    ANALYTIC_EVENT_STATES,
 };

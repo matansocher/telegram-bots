@@ -11,7 +11,8 @@ const LOADER_MESSAGES = [
     'Just a little bit longer...',
     'Hang tight, almost there...',
     'Any second now...',
-    'Thanks for your patience...'
+    'Thanks for your patience...',
+    'This is my last loading message, if there is no response, show it to Matan 😁',
 ];
 
 class MessageLoader {
@@ -28,7 +29,7 @@ class MessageLoader {
 
     waitForMessage() {
         try {
-            generalBotService.setBotTyping(this.bot, this.chatId);
+            generalBotService.setBotTyping(this.bot, this.chatId, this.options.loadingAction);
             this.cycleInitiator();
         } catch (err) {
             logger.error(this.waitForMessage.name, `error - ${utilsService.getErrorMessage(err)}`);
@@ -54,7 +55,7 @@ class MessageLoader {
         } else {
             messagePromise = generalBotService.editMessageText(this.bot, this.chatId, this.loaderMessageId, messageText);
         }
-        generalBotService.setBotTyping(this.bot, this.chatId);
+        generalBotService.setBotTyping(this.bot, this.chatId, this.options.loadingAction);
 
         const messageRes = await messagePromise;
         this.loaderMessageId = (messageRes && messageRes.message_id) ? messageRes.message_id : this.loaderMessageId;

@@ -2,13 +2,14 @@ const {
     INITIAL_BOT_RESPONSE,
     NOTEBOOK_BOT_ACTIONS_TO_SAVE,
     NOTEBOOK_LIST_ACTIONS,
-    ANALYTIC_EVENT_NAMES, NOTEBOOK_LIST_ITEM_ACTIONS,
+    ANALYTIC_EVENT_NAMES,
+    NOTEBOOK_LIST_ITEM_ACTIONS,
 } = require('./notebook.config');
+const { LOCAL_FILES_PATH } = require('../voice-pal/voice-pal.config');
 const notebookUtils = require('./notebook.utils');
 const userSelectionService = require('./user-selections.service');
 const mongoService = require('../mongo/notebook/mongo.service');
 const generalBotService = require('../../telegram-bots/general-bot.service');
-const { LOCAL_FILES_PATH } = require('../voice-pal/voice-pal.config');
 const imgurService = require('../imgur.service');
 
 class NotebookService {
