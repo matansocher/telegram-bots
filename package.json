@@ -19,6 +19,7 @@
   "homepage": "https://github.com/matansocher/telegram-bots#readme",
   "dependencies": {
     "@vitalets/google-translate-api": "^9.2.0",
+    "@whiskeysockets/baileys": "^6.7.5",
     "axios": "^1.6.1",
     "body-parser": "^1.20.2",
     "dotenv": "^16.3.1",
@@ -29,6 +30,8 @@
     "nayan-media-downloader": "^2.3.9",
     "node-telegram-bot-api": "^0.66.0",
     "openai": "^4.45.0",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.24.0",
     "youtube-transcript": "^1.2.1"
   }
 }
