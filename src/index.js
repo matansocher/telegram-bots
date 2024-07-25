@@ -3,9 +3,11 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
 
-require('./telegram-bots/wolt-bot.service');
-require('./telegram-bots/voice-pal-bot.service');
+// require('./telegram-bots/wolt-bot.service');
+// require('./telegram-bots/voice-pal-bot.service');
 // require('./telegram-bots/notebook-bot.service');
+
+require('./whatsapp-bots/first-bot.service');
 
 app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
