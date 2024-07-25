@@ -11,7 +11,7 @@ const bot = new TelegramBot(process.env.WOLT_TELEGRAM_BOT_TOKEN, { polling: true
 const logger = new (require('../services/logger.service'))(module.filename);
 
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$ worker $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
-(async function startInterval() {
+async function startInterval() {
     await cleanExpiredSubscriptions();
     const subscriptions = await mongoService.getActiveSubscriptions();
     if (subscriptions && subscriptions.length) {
@@ -23,7 +23,9 @@ const logger = new (require('../services/logger.service'))(module.filename);
     setTimeout(async () => {
         await startInterval();
     }, secondsToNextRefresh * 1000);
-})();
+}
+
+setTimeout(async () => await startInterval(), 5000);
 
 function getSecondsToNextRefresh() {
     const currentHour = new Date().getHours() + woltConfig.HOURS_DIFFERENCE_FROM_UTC;
