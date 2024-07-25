@@ -4,7 +4,11 @@
   "description": "",
   "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
+    "start": "npm-run-all --parallel build:watch run:watch",
+    "build": "tsc",
+    "run": "node dist/my-app.js",
+    "build:watch": "tsc --watch",
+    "run:watch": "nodemon dist/my-app.js --watch dist",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
@@ -30,5 +34,8 @@
     "node-telegram-bot-api": "^0.66.0",
     "openai": "^4.45.0",
     "youtube-transcript": "^1.2.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.4"
   }
 }
