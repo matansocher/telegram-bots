@@ -25,10 +25,11 @@ async function getTranscriptFromAudio(audioFilePath, language) {
 
 async function getTranslationFromAudio(audioFilePath) {
     const file = fs.createReadStream(audioFilePath);
-    return openai.audio.translations.create({
+    const result = await openai.audio.translations.create({
         file,
         model: SOUND_MODEL,
     });
+    return result.text;
 }
 
 async function getAudioFromText(text) {
